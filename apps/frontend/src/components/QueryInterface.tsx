@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Send, StopCircle, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+import { Send, StopCircle } from "lucide-react";
 import { useSSE } from "@/hooks/useSSE";
 import { useQueryStore } from "@/hooks/useQuery";
 import { CitationPill } from "./CitationPill";
 import { LanguageToggle } from "./LanguageToggle";
-import { Citation, CrewRole, Language } from "@/types";
+import { Citation, CrewRole } from "@/types";
 import messages from "@/i18n";
 
 const CREW_ROLES: CrewRole[] = [

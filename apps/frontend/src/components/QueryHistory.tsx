@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, Bookmark, BookmarkCheck, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { Clock, Bookmark, BookmarkCheck, ChevronDown, ChevronUp } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { CitationPill } from "./CitationPill";
 import { Query } from "@/types";

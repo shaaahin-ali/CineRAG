@@ -3,7 +3,7 @@
 "use client";
 
 import { create } from "zustand";
-import { Citation, CrewRole, Language, Query, QueryState } from "@/types";
+import { CrewRole, Language, QueryState } from "@/types";
 
 export const useQueryStore = create<QueryState>()((set) => ({
   currentQuery: "",

@@ -114,7 +114,7 @@ export function CitationPill({ citation, index }: CitationPillProps) {
             {/* Excerpt */}
             <p className="text-xs leading-relaxed"
               style={{ color: "var(--text-muted)", fontStyle: "italic" }}>
-              "{citation.excerpt.slice(0, 200)}{citation.excerpt.length > 200 ? "..." : ""}"
+              &ldquo;{citation.excerpt.slice(0, 200)}{citation.excerpt.length > 200 ? "..." : ""}&rdquo;
             </p>
 
             {/* Relevance score */}
