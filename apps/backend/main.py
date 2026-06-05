@@ -1,0 +1,67 @@
+"""
+CinePhile Malayalam Edition — FastAPI Entry Point
+🎬 AI-powered RAG platform for Mollywood screenplays
+"""
+
+import logging
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.api import health, projects, query, scenes, upload
+from app.core.config import settings
+from app.core.logging import setup_logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):  # noqa: ANN001
+    """Startup and shutdown events."""
+    logger.info("🎬 CinePhile Malayalam Edition starting up...")
+    logger.info(f"Environment: {settings.FASTAPI_ENV}")
+    logger.info(f"Pinecone index: {settings.PINECONE_INDEX_NAME} (3072 dims)")
+    yield
+    logger.info("🎬 CinePhile shutting down gracefully...")
+
+
+app = FastAPI(
+    title="CinePhile API — Malayalam Edition",
+    description=(
+        "AI-powered RAG platform for Mollywood screenplays. "
+        "Upload screenplays, query in Malayalam or English, "
+        "get streaming responses with scene citations."
+    ),
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    lifespan=lifespan,
+)
+
+# ── CORS ─────────────────────────────────────────────────────────────────────
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ── Routers ───────────────────────────────────────────────────────────────────
+app.include_router(health.router, prefix="/api/v1", tags=["health"])
+app.include_router(projects.router, prefix="/api/v1", tags=["projects"])
+app.include_router(upload.router, prefix="/api/v1", tags=["upload"])
+app.include_router(query.router, prefix="/api/v1", tags=["query"])
+app.include_router(scenes.router, prefix="/api/v1", tags=["scenes"])
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=settings.FASTAPI_PORT,
+        reload=settings.FASTAPI_ENV == "development",
+    )
