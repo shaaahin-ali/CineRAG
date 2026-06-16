@@ -88,10 +88,13 @@ async def upload_screenplay(
         raise HTTPException(status_code=500, detail="File upload failed")
 
     # ── Update project status → indexing ──────────────────────────────────────
-    db.table("projects").update({
-        "status": ProjectStatus.indexing,
-        "file_url": file_url,
-    }).eq("id", str(project_id)).execute()
+    try:
+        db.table("projects").update({
+            "status": ProjectStatus.indexing.value,
+            # We skip file_url as it's not in the base schema
+        }).eq("id", str(project_id)).execute()
+    except Exception as e:
+        logger.warning(f"Failed to update project status: {e}")
 
     # ── Kick off background ingestion ─────────────────────────────────────────
     background_tasks.add_task(

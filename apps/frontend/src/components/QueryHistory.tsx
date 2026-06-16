@@ -7,6 +7,7 @@ import { Clock, Bookmark, BookmarkCheck, ChevronDown, ChevronUp } from "lucide-r
 import { api } from "@/lib/api-client";
 import { CitationPill } from "./CitationPill";
 import { Query } from "@/types";
+import { MorphingSquare } from "@/components/ui/morphing-square";
 
 interface QueryHistoryProps {
   projectId: string;
@@ -36,14 +37,10 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
 
   return (
     <div
-      className="rounded-xl overflow-hidden transition-all"
-      style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.06)",
-      }}
+      className="overflow-hidden border-b border-white/5 transition-all last:border-b-0"
     >
       {/* Header row */}
-      <div className="flex items-start gap-3 p-4">
+      <div className="flex items-start gap-3 py-4">
         <div className="flex-1 min-w-0">
           <button
             id={`query-expand-${query.id}`}
@@ -51,7 +48,7 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
             className="text-left w-full group"
           >
             <p
-              className={`text-sm font-medium text-white line-clamp-2 group-hover:text-yellow-300 transition-colors ${
+              className={`text-sm font-medium text-white line-clamp-2 transition-colors group-hover:text-zinc-300 ${
                 query.detected_language === "ml" ? "font-malayalam" : ""
               }`}
             >
@@ -61,33 +58,26 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
 
           <div className="flex items-center gap-3 mt-2">
             <span
-              className="flex items-center gap-1 text-xs"
-              style={{ color: "var(--text-muted)" }}
+              className="flex items-center gap-1 text-xs text-zinc-500"
             >
               <Clock className="w-3 h-3" />
               {formatRelativeTime(query.created_at)}
             </span>
 
             {query.latency_ms && (
-              <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+              <span className="text-xs text-zinc-500">
                 {query.latency_ms}ms
               </span>
             )}
 
             {query.detected_language && (
               <span
-                className="text-xs px-1.5 py-0.5 rounded"
+                className="rounded-full border border-white/10 px-2 py-0.5 text-xs text-zinc-300"
                 style={{
-                  background:
-                    query.detected_language === "ml"
-                      ? "rgba(253,176,34,0.1)"
-                      : "rgba(96,165,250,0.1)",
-                  color:
-                    query.detected_language === "ml"
-                      ? "var(--accent-gold)"
-                      : "#60A5FA",
                   fontFamily:
-                    query.detected_language === "ml" ? "Meera Inimai" : "inherit",
+                    query.detected_language === "ml"
+                      ? "Noto Sans Malayalam, Malayalam MN, Nirmala UI, sans-serif"
+                      : "inherit",
                 }}
               >
                 {query.detected_language === "ml" ? "മലയാളം" : "English"}
@@ -102,11 +92,7 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
             id={`bookmark-${query.id}`}
             onClick={() => bookmarkMutation.mutate()}
             disabled={bookmarkMutation.isPending}
-            className="p-2 rounded-lg transition-all"
-            style={{
-              color: query.bookmarked ? "var(--accent-gold)" : "var(--text-muted)",
-              background: query.bookmarked ? "rgba(253,176,34,0.08)" : "transparent",
-            }}
+            className="rounded-lg p-2 text-zinc-400 transition-all hover:bg-white/5 hover:text-white"
             title={query.bookmarked ? "Remove bookmark" : "Bookmark"}
           >
             {query.bookmarked ? (
@@ -118,8 +104,7 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
 
           <button
             onClick={() => setExpanded(!expanded)}
-            className="p-2 rounded-lg transition-all"
-            style={{ color: "var(--text-muted)" }}
+            className="rounded-lg p-2 text-zinc-400 transition-all hover:bg-white/5 hover:text-white"
           >
             {expanded ? (
               <ChevronUp className="w-4 h-4" />
@@ -141,15 +126,13 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
             className="overflow-hidden"
           >
             <div
-              className="px-4 pb-4 border-t"
-              style={{ borderColor: "rgba(255,255,255,0.04)" }}
+              className="border-t border-white/5 pb-4 pt-4"
             >
               {/* Citations */}
               {query.citations && query.citations.length > 0 && (
                 <div className="pt-4 mb-3">
                   <p
-                    className="text-xs font-medium mb-2"
-                    style={{ color: "var(--text-muted)" }}
+                    className="mb-2 text-xs font-medium text-zinc-500"
                   >
                     References:
                   </p>
@@ -192,25 +175,14 @@ export function QueryHistory({ projectId }: QueryHistoryProps) {
     : queries;
 
   return (
-    <div id="query-history" className="h-full flex flex-col">
+    <div id="query-history" className="h-full flex flex-col p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-white">Query History</h3>
         <button
           id="filter-bookmarked"
           onClick={() => setShowBookmarked(!showBookmarked)}
-          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-all"
-          style={{
-            background: showBookmarked
-              ? "rgba(253,176,34,0.1)"
-              : "rgba(255,255,255,0.04)",
-            border: `1px solid ${
-              showBookmarked
-                ? "rgba(253,176,34,0.3)"
-                : "rgba(255,255,255,0.06)"
-            }`,
-            color: showBookmarked ? "var(--accent-gold)" : "var(--text-muted)",
-          }}
+          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-transparent px-3 py-1.5 text-xs text-zinc-400 transition-all hover:bg-white/5 hover:text-white"
         >
           <Bookmark className="w-3 h-3" />
           Bookmarked
@@ -218,17 +190,14 @@ export function QueryHistory({ projectId }: QueryHistoryProps) {
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto space-y-2">
+      <div className="flex-1 overflow-y-auto">
         {isLoading ? (
-          <>
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="skeleton h-16 rounded-xl" />
-            ))}
-          </>
+          <div className="flex min-h-[240px] items-center justify-center rounded-3xl border border-white/5 bg-transparent">
+            <MorphingSquare message="Loading history..." messagePlacement="bottom" className="bg-transparent" />
+          </div>
         ) : displayed.length === 0 ? (
           <div
-            className="text-center py-12"
-            style={{ color: "var(--text-muted)" }}
+            className="py-12 text-center text-zinc-500"
           >
             <Clock className="w-8 h-8 mx-auto mb-2 opacity-30" />
             <p className="text-sm">

@@ -7,7 +7,7 @@ from enum import Enum
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class IntExt(str, Enum):
@@ -36,8 +36,7 @@ class SceneOut(BaseModel):
 
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CharacterOut(BaseModel):

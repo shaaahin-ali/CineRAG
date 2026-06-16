@@ -83,11 +83,11 @@ export function RoleSelector({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => onChange(role.value)}
-            className="relative flex items-center gap-2.5 p-3 rounded-xl text-left transition-all"
+            className="relative flex items-center gap-2.5 rounded-xl p-3 text-left transition-all"
             style={{
               background: isSelected
                 ? `${role.color}12`
-                : "rgba(255,255,255,0.03)",
+                : "rgba(255,255,255,0.02)",
               border: `1px solid ${
                 isSelected ? `${role.color}35` : "rgba(255,255,255,0.06)"
               }`,
@@ -106,22 +106,19 @@ export function RoleSelector({
               />
             )}
 
-            <span className="text-xl relative">{role.emoji}</span>
+            <span className="relative text-xl">{role.emoji}</span>
             <div className="relative min-w-0">
               <p
                 className={`text-sm font-semibold leading-tight ${
                   language === "ml" ? "font-malayalam" : ""
                 }`}
                 style={{
-                  color: isSelected ? role.color : "var(--text-primary)",
+                  color: isSelected ? role.color : "#ffffff",
                 }}
               >
                 {language === "ml" ? role.ml : role.en}
               </p>
-              <p
-                className="text-xs truncate mt-0.5"
-                style={{ color: "var(--text-muted)" }}
-              >
+              <p className="mt-0.5 truncate text-xs text-zinc-500">
                 {role.desc}
               </p>
             </div>

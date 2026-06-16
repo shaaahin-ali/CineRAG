@@ -9,7 +9,7 @@ import json
 from typing import List
 
 from pydantic import field_validator
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -25,19 +25,29 @@ class Settings(BaseSettings):
     # ── Pinecone ─────────────────────────────────────────────────────────────
     PINECONE_API_KEY: str
     PINECONE_INDEX_NAME: str = "cinephile"
-    PINECONE_EMBEDDING_DIMENSION: int = 3072  # text-embedding-3-large
+    PINECONE_EMBEDDING_DIMENSION: int = 3072  # OpenAI text-embedding-3-large
+    GEMINI_EMBEDDING_DIMENSION: int = 768  # gemini-embedding-001 (matches Pinecone index)
+    GEMINI_EMBEDDING_MODEL: str = "gemini-embedding-001"
+    GEMINI_CHAT_MODEL: str = "gemini-1.5-flash"
 
     # ── OpenAI ───────────────────────────────────────────────────────────────
-    OPENAI_API_KEY: str
+    OPENAI_API_KEY: str = ""
     OPENAI_EMBEDDING_MODEL: str = "text-embedding-3-large"
 
     # ── Anthropic ────────────────────────────────────────────────────────────
-    ANTHROPIC_API_KEY: str
+    ANTHROPIC_API_KEY: str = ""
     ANTHROPIC_MODEL: str = "claude-sonnet-4-5"
 
     # ── Cohere ───────────────────────────────────────────────────────────────
-    COHERE_API_KEY: str
+    COHERE_API_KEY: str = ""
     COHERE_RERANK_MODEL: str = "rerank-english-v3.0"
+
+    # ── Gemini ───────────────────────────────────────────────────────────────
+    GEMINI_API_KEY: str = ""
+
+    # ── OpenRouter ───────────────────────────────────────────────────────────
+    OPENROUTER_API_KEY: str = ""
+    OPENROUTER_CHAT_MODEL: str = "meta-llama/llama-3.3-70b-instruct:free"
 
     # ── Auth ─────────────────────────────────────────────────────────────────
     JWT_SECRET: str
@@ -67,10 +77,12 @@ class Settings(BaseSettings):
                 return [origin.strip() for origin in v.split(",")]
         return v
 
-    class Config:
-        env_file = ".env.local"
-        env_file_encoding = "utf-8"
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file=".env.local",
+        env_file_encoding="utf-8",
+        case_sensitive=True
+    )
 
 
 settings = Settings()
+

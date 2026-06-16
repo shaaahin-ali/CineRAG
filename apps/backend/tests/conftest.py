@@ -15,6 +15,8 @@ os.environ.setdefault("OPENAI_API_KEY", "mock-openai-key")
 os.environ.setdefault("ANTHROPIC_API_KEY", "mock-anthropic-key")
 os.environ.setdefault("COHERE_API_KEY", "mock-cohere-key")
 os.environ.setdefault("JWT_SECRET", "test-jwt-secret-key-for-testing-only")
+# Force OpenAI/Anthropic path in tests — ignore real .env.local Gemini key
+os.environ["GEMINI_API_KEY"] = ""
 
 
 @pytest.fixture(scope="module")

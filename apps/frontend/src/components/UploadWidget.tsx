@@ -52,7 +52,7 @@ export function UploadWidget({ projectId, onUploadStart, onUploadComplete }: Upl
         clearInterval(progressInterval);
         setProgress(100);
         setState("success");
-        toast.success("Screenplay uploaded! Indexing scenes...", {
+        toast.success("Screenplay uploaded! Indexing scenes…", {
           description: "This may take 1–2 minutes.",
         });
         onUploadComplete?.();
@@ -92,43 +92,49 @@ export function UploadWidget({ projectId, onUploadStart, onUploadComplete }: Upl
     setProgress(0);
   };
 
+  const borderColor =
+    state === "dragging"
+      ? "border-amber-500/40"
+      : state === "success"
+        ? "border-emerald-500/30"
+        : state === "error"
+          ? "border-red-500/30"
+          : "border-white/[0.08]";
+
+  const bgColor =
+    state === "dragging"
+      ? "bg-amber-500/[0.03]"
+      : state === "success"
+        ? "bg-emerald-500/[0.02]"
+        : state === "error"
+          ? "bg-red-500/[0.02]"
+          : "bg-white/[0.01]";
+
   return (
     <div
       id="upload-widget"
       onDragOver={(e) => { e.preventDefault(); setState("dragging"); }}
       onDragLeave={() => state === "dragging" && setState("idle")}
       onDrop={onDrop}
-      className="relative rounded-2xl p-8 text-center transition-all"
+      className={`relative rounded-[20px] border-2 border-dashed p-10 text-center transition-all duration-300 ${borderColor} ${bgColor}`}
       style={{
-        border: `2px dashed ${
-          state === "dragging" ? "rgba(253,176,34,0.6)"
-          : state === "success" ? "rgba(52,211,153,0.4)"
-          : state === "error" ? "rgba(248,113,113,0.4)"
-          : "rgba(255,255,255,0.1)"
-        }`,
-        background:
-          state === "dragging" ? "rgba(253,176,34,0.04)"
-          : state === "success" ? "rgba(52,211,153,0.04)"
-          : state === "error" ? "rgba(248,113,113,0.04)"
-          : "rgba(255,255,255,0.02)",
         cursor: state === "idle" || state === "dragging" ? "pointer" : "default",
       }}
     >
       <AnimatePresence mode="wait">
         {state === "idle" || state === "dragging" ? (
           <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center"
-              style={{ background: "rgba(253,176,34,0.1)" }}>
-              <Upload className="w-7 h-7" style={{ color: "var(--accent-gold)" }} />
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.03]">
+              <Upload className="h-5 w-5 text-amber-400/70" />
             </div>
-            <p className="font-semibold text-white mb-1">
-              {state === "dragging" ? "Drop it here!" : "Upload Screenplay"}
+            <p className="text-sm font-medium text-white">
+              {state === "dragging" ? "Drop it here" : "Upload Screenplay"}
             </p>
-            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
-              PDF, DOCX, or TXT · Max 50MB
+            <p className="mt-1 text-xs text-zinc-600">
+              PDF, DOCX, or TXT · Max 50 MB
             </p>
-            <label className="btn-primary inline-block cursor-pointer">
-              Browse Files
+            <label className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:bg-zinc-200">
+              Browse files
               <input
                 type="file"
                 accept=".pdf,.docx,.txt"
@@ -137,43 +143,46 @@ export function UploadWidget({ projectId, onUploadStart, onUploadComplete }: Upl
                 id="screenplay-file-input"
               />
             </label>
-            <p className="font-malayalam text-xs mt-3" style={{ color: "var(--text-muted)" }}>
+            <p className="font-malayalam mt-3 text-[11px] text-zinc-700">
               തിരക്കഥ അപ്‌ലോഡ് ചെയ്യുക
             </p>
           </motion.div>
         ) : state === "uploading" ? (
           <motion.div key="uploading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <FileText className="w-10 h-10 mx-auto mb-3" style={{ color: "var(--accent-gold)" }} />
-            <p className="font-medium text-white mb-1">{fileName}</p>
-            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
-              {progress < 100 ? "Uploading screenplay..." : "Processing..."}
+            <FileText className="mx-auto mb-3 h-8 w-8 text-amber-400/60" />
+            <p className="text-sm font-medium text-white">{fileName}</p>
+            <p className="mt-1 text-xs text-zinc-600">
+              {progress < 100 ? "Uploading screenplay…" : "Processing…"}
             </p>
-            <div className="h-2 rounded-full overflow-hidden mx-auto max-w-xs"
-              style={{ background: "rgba(255,255,255,0.06)" }}>
-              <motion.div
-                className="h-full rounded-full"
-                style={{ background: "linear-gradient(90deg, #FDB022, #F79009)" }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.3 }}
-              />
+            <div className="mx-auto mt-4 max-w-xs">
+              <div className="h-[3px] overflow-hidden rounded-full bg-white/[0.04]">
+                <motion.div
+                  className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-600"
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+              <p className="mt-2 text-[11px] text-amber-400/60">{progress}%</p>
             </div>
-            <p className="text-xs mt-2" style={{ color: "var(--accent-gold)" }}>{progress}%</p>
           </motion.div>
         ) : state === "success" ? (
-          <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-            <CheckCircle className="w-12 h-12 mx-auto mb-3" style={{ color: "#34D399" }} />
-            <p className="font-semibold text-white mb-1">Uploaded successfully!</p>
-            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              Scenes are being indexed into Pinecone. Check project status for updates.
+          <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+            <CheckCircle className="mx-auto mb-3 h-10 w-10 text-emerald-400" />
+            <p className="text-sm font-semibold text-white">Uploaded successfully</p>
+            <p className="mt-1 text-xs text-zinc-600">
+              Scenes are being indexed. Check project status for updates.
             </p>
           </motion.div>
         ) : (
           <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <AlertCircle className="w-12 h-12 mx-auto mb-3" style={{ color: "#F87171" }} />
-            <p className="font-semibold text-white mb-1">Upload failed</p>
-            <p className="text-sm mb-4" style={{ color: "#F87171" }}>{error}</p>
-            <button onClick={reset} className="btn-ghost flex items-center gap-2 mx-auto">
-              <X className="w-4 h-4" />
+            <AlertCircle className="mx-auto mb-3 h-10 w-10 text-red-400" />
+            <p className="text-sm font-semibold text-white">Upload failed</p>
+            <p className="mt-1 text-xs text-red-400/80">{error}</p>
+            <button
+              onClick={reset}
+              className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/[0.08] px-4 py-2 text-xs font-medium text-zinc-400 transition hover:border-white/15 hover:text-white"
+            >
+              <X className="w-3 h-3" />
               Try again
             </button>
           </motion.div>

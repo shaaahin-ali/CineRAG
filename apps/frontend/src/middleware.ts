@@ -3,17 +3,17 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 // Routes that require authentication
-const PROTECTED_ROUTES = ["/dashboard", "/query"];
+const PROTECTED_ROUTES = ["/dashboard", "/query", "/profile"];
 
 // Routes only accessible when NOT authenticated
-const AUTH_ROUTES = ["/auth/login", "/auth/signup"];
+const AUTH_ROUTES = ["/auth", "/auth/login", "/auth/signup"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Check if route is protected
   const isProtected = PROTECTED_ROUTES.some((route) =>
-    pathname.startsWith(route)
+    pathname.startsWith(route),
   );
 
   // Check if route is auth-only (login/signup)
@@ -30,8 +30,8 @@ export async function middleware(request: NextRequest) {
   });
 
   if (isProtected && !token) {
-    // Redirect unauthenticated users to login
-    const loginUrl = new URL("/auth/login", request.url);
+    // Redirect unauthenticated users to the auth choice screen
+    const loginUrl = new URL("/auth", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
@@ -45,5 +45,11 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/query/:path*", "/auth/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/query/:path*",
+    "/profile/:path*",
+    "/auth",
+    "/auth/:path*",
+  ],
 };

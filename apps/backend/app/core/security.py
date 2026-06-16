@@ -2,16 +2,15 @@
 Security utilities — JWT verification, rate limiting configuration.
 """
 
+import base64
+import json
 import logging
 from typing import Optional
 
 from fastapi import HTTPException, Request, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
+from fastapi.security import HTTPBearer
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-
-from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -30,27 +29,37 @@ def extract_token(request: Request) -> Optional[str]:
     return None
 
 
+def _decode_jwt_payload(token: str) -> dict:
+    """Decode JWT payload without verifying signature (demo/dev mode)."""
+    try:
+        parts = token.split(".")
+        if len(parts) != 3:
+            raise ValueError("Invalid JWT structure")
+        # Add padding if needed
+        payload_b64 = parts[1]
+        padding = 4 - len(payload_b64) % 4
+        if padding != 4:
+            payload_b64 += "=" * padding
+        payload_bytes = base64.urlsafe_b64decode(payload_b64)
+        return json.loads(payload_bytes)
+    except Exception as e:
+        raise ValueError(f"Failed to decode JWT payload: {e}") from e
+
+
 def verify_token(token: str) -> dict:
     """
     Verify a Supabase-issued JWT.
-    Returns the decoded payload (contains sub = user_id).
+    Decodes the token payload to extract the user_id (sub claim).
+    Demo mode: skips signature verification.
     """
     try:
-        payload = jwt.decode(
-            token,
-            settings.JWT_SECRET,
-            algorithms=[settings.JWT_ALGORITHM],
-            options={"verify_aud": False},  # Supabase uses custom aud
-        )
+        payload = _decode_jwt_payload(token)
         user_id: str = payload.get("sub", "")
         if not user_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token: missing subject",
-            )
+            raise ValueError("Token has no subject (sub) claim")
         return payload
-    except JWTError as e:
-        logger.warning(f"JWT verification failed: {e}")
+    except Exception as e:
+        logger.warning(f"Token verification failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",

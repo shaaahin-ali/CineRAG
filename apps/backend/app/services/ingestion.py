@@ -118,12 +118,7 @@ async def run_ingestion_pipeline(
                 "page_end": s["page_end"],
                 "heading": s["heading"],
                 "location": s["location"],
-                "time_of_day": s.get("time_of_day"),
-                "int_ext": s.get("int_ext"),
-                "characters": s.get("characters", []),
                 "content": s["content"],
-                "detected_emotions": s.get("detected_emotions", []),
-                "estimated_duration_seconds": s.get("estimated_duration_seconds"),
             }
             for s in scenes
         ]
@@ -135,7 +130,7 @@ async def run_ingestion_pipeline(
             all_chars.update(s.get("characters", []))
 
         db.table("projects").update({
-            "status": ProjectStatus.ready,
+            "status": ProjectStatus.ready.value,
             "scene_count": len(scenes),
             "page_count": scenes[-1]["page_end"] if scenes else 0,
             "character_count": len(all_chars),
@@ -147,7 +142,7 @@ async def run_ingestion_pipeline(
         )
 
     except Exception as e:
-        logger.error(f"[Ingestion] ❌ Failed for project {project_id}: {e}", exc_info=True)
+        logger.error(f"[Ingestion] Failed for project {project_id}: {e}", exc_info=True)
         db.table("projects").update({
-            "status": ProjectStatus.error,
+            "status": ProjectStatus.error.value,
         }).eq("id", project_id).execute()

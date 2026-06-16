@@ -77,6 +77,8 @@ def _split_text(text: str, max_chars: int, overlap: int) -> List[str]:
                 end = newline_pos
 
         chunks.append(text[start:end].strip())
-        start = end - overlap  # Overlap for context
+        if end >= len(text):
+            break
+        start = max(start + 1, end - overlap)
 
     return [c for c in chunks if c]

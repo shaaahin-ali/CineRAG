@@ -1,12 +1,24 @@
 // Typed fetch wrapper with auth headers
+// Gets the Supabase access token directly from the Supabase client session
+// (not from NextAuth) so it is always fresh and available after login.
+
+import { supabase } from "@/lib/auth";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+import { getSession } from "next-auth/react";
+
 async function getAuthToken(): Promise<string | null> {
   try {
-    const res = await fetch("/api/auth/session");
-    const session = await res.json();
-    return session?.user?.token || null;
+    // Prefer NextAuth session which is cookie-based and reliable across reloads
+    const nextAuthSession = await getSession();
+    if (nextAuthSession?.user && 'token' in nextAuthSession.user) {
+      return (nextAuthSession.user as { token?: string }).token ?? null;
+    }
+
+    // Fallback to Supabase JS client
+    const { data } = await supabase.auth.getSession();
+    return data?.session?.access_token ?? null;
   } catch {
     return null;
   }
@@ -31,6 +43,10 @@ async function apiRequest<T>(
     throw new Error(error.detail || `API error: ${res.status}`);
   }
 
+  if (res.status === 204) {
+    return {} as T;
+  }
+
   return res.json();
 }
 
@@ -44,6 +60,12 @@ export const api = {
     }),
 
   delete: <T>(path: string) => apiRequest<T>(path, { method: "DELETE" }),
+
+  patch: <T>(path: string, body?: unknown) =>
+    apiRequest<T>(path, {
+      method: "PATCH",
+      body: body ? JSON.stringify(body) : undefined,
+    }),
 
   upload: async <T>(path: string, file: File): Promise<T> => {
     const token = await getAuthToken();

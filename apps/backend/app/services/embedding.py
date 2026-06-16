@@ -19,13 +19,19 @@ _openai_client: AsyncOpenAI | None = None
 def get_openai_client() -> AsyncOpenAI:
     global _openai_client
     if _openai_client is None:
-        _openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        if settings.GEMINI_API_KEY:
+            _openai_client = AsyncOpenAI(
+                api_key=settings.GEMINI_API_KEY,
+                base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+            )
+        else:
+            _openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
     return _openai_client
 
 
 async def embed_texts(texts: List[str], batch_size: int = 100) -> List[List[float]]:
     """
-    Embed a list of texts using text-embedding-3-large (3072 dims).
+    Embed a list of texts using text-embedding-3-large (3072 dims) or gemini-embedding-001 (768 dims).
     Batches requests to stay within API limits.
     """
     client = get_openai_client()
@@ -37,11 +43,21 @@ async def embed_texts(texts: List[str], batch_size: int = 100) -> List[List[floa
 
         for attempt in range(3):
             try:
-                response = await client.embeddings.create(
-                    model=settings.OPENAI_EMBEDDING_MODEL,  # text-embedding-3-large
-                    input=batch,
-                    dimensions=settings.PINECONE_EMBEDDING_DIMENSION,  # 3072
+                kwargs = {
+                    "model": (
+                        settings.GEMINI_EMBEDDING_MODEL
+                        if settings.GEMINI_API_KEY
+                        else settings.OPENAI_EMBEDDING_MODEL
+                    ),
+                    "input": batch,
+                }
+                kwargs["dimensions"] = (
+                    settings.GEMINI_EMBEDDING_DIMENSION
+                    if settings.GEMINI_API_KEY
+                    else settings.PINECONE_EMBEDDING_DIMENSION
                 )
+
+                response = await client.embeddings.create(**kwargs)
                 embeddings = [item.embedding for item in response.data]
                 all_embeddings.extend(embeddings)
                 break

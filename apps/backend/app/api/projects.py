@@ -17,10 +17,8 @@ from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 
-from app.core.security import extract_token, get_current_user_id
+from app.core.security import extract_token, get_current_user_id, limiter
 from app.models.project import (
     CrewRole,
     InviteMemberRequest,
@@ -29,13 +27,13 @@ from app.models.project import (
     ProjectOut,
     ProjectStatus,
     ProjectStatusOut,
+    ProjectUpdate,
 )
 from app.services.auth import verify_project_access
 from app.services.storage import SupabaseClient
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
-limiter = Limiter(key_func=get_remote_address)
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -62,7 +60,7 @@ async def create_project(
         "title": body.title,
         "description": body.description,
         "owner_id": user_id,
-        "status": ProjectStatus.uploading,
+        "status": ProjectStatus.uploading.value,
     }).execute()
 
     if not result.data:
@@ -74,25 +72,77 @@ async def create_project(
 
 @router.get("/projects", response_model=List[ProjectOut])
 async def list_projects(request: Request) -> List[ProjectOut]:
-    """List all projects accessible to the current user."""
+    """List all projects accessible to the current user (owned or invited to)."""
     user_id = get_user_id(request)
     db = SupabaseClient()
 
-    # RLS handles filtering — only projects user owns or is member of
-    result = db.table("projects").select("*").order("created_at", desc=True).execute()
-    return [ProjectOut(**p) for p in (result.data or [])]
+    # 1. Projects the user owns
+    owned = db.table("projects").select("*").eq(
+        "owner_id", user_id
+    ).order("created_at", desc=True).execute()
+    owned_data = owned.data or []
+
+    # 2. project_ids where user is a member
+    membership = db.table("project_members").select("project_id").eq(
+        "user_id", user_id
+    ).execute()
+    member_project_ids = [row["project_id"] for row in (membership.data or [])]
+
+    # 3. Projects accessible via membership (exclude already-owned to avoid dupes)
+    owned_ids = {p["id"] for p in owned_data}
+    shared_data: list = []
+    if member_project_ids:
+        remaining_ids = [pid for pid in member_project_ids if pid not in owned_ids]
+        if remaining_ids:
+            shared = db.table("projects").select("*").in_(
+                "id", remaining_ids
+            ).order("created_at", desc=True).execute()
+            shared_data = shared.data or []
+
+    all_projects = owned_data + shared_data
+    return [ProjectOut(**p) for p in all_projects]
 
 
 @router.get("/projects/{project_id}", response_model=ProjectOut)
 async def get_project(request: Request, project_id: UUID) -> ProjectOut:
-    """Get a single project by ID."""
+    """Get a single project by ID (must be owner or member)."""
     user_id = get_user_id(request)
-    db = SupabaseClient()
 
+    # Verify the requesting user has access before returning data
+    await verify_project_access(project_id, user_id)
+
+    db = SupabaseClient()
     result = db.table("projects").select("*").eq("id", str(project_id)).single().execute()
     if not result.data:
         raise HTTPException(status_code=404, detail="Project not found")
     return ProjectOut(**result.data)
+
+
+@router.patch("/projects/{project_id}", response_model=ProjectOut)
+async def update_project(
+    request: Request,
+    project_id: UUID,
+    body: ProjectUpdate,
+) -> ProjectOut:
+    """Update project details (owner only)."""
+    user_id = get_user_id(request)
+    db = SupabaseClient()
+
+    # Verify ownership
+    result = db.table("projects").select("owner_id").eq("id", str(project_id)).single().execute()
+    if not result.data or result.data["owner_id"] != user_id:
+        raise HTTPException(status_code=403, detail="Only the project owner can update it")
+
+    update_data = body.model_dump(exclude_unset=True)
+    if not update_data:
+        return await get_project(request, project_id)
+
+    update_result = db.table("projects").update(update_data).eq("id", str(project_id)).execute()
+    if not update_result.data:
+        raise HTTPException(status_code=500, detail="Failed to update project")
+    
+    logger.info(f"Project {project_id} updated by {user_id}")
+    return ProjectOut(**update_result.data[0])
 
 
 @router.delete("/projects/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -112,16 +162,19 @@ async def delete_project(request: Request, project_id: UUID) -> None:
 
 @router.get("/projects/{project_id}/status", response_model=ProjectStatusOut)
 async def get_project_status(request: Request, project_id: UUID) -> ProjectStatusOut:
-    """Poll ingestion status."""
+    """Poll ingestion status (must be owner or member)."""
     user_id = get_user_id(request)
-    db = SupabaseClient()
 
+    await verify_project_access(project_id, user_id)
+
+    db = SupabaseClient()
     result = db.table("projects").select(
         "id,status,scene_count,page_count"
     ).eq("id", str(project_id)).single().execute()
 
     if not result.data:
         raise HTTPException(status_code=404, detail="Project not found")
+
 
     d = result.data
     messages = {

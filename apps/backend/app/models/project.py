@@ -7,7 +7,7 @@ from enum import Enum
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ProjectStatus(str, Enum):
@@ -33,6 +33,10 @@ class ProjectCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = Field(None, max_length=1000)
 
+class ProjectUpdate(BaseModel):
+    title: Optional[str] = Field(None, min_length=1, max_length=200)
+    description: Optional[str] = Field(None, max_length=1000)
+
 
 class InviteMemberRequest(BaseModel):
     email: str
@@ -47,8 +51,7 @@ class ProjectMemberOut(BaseModel):
     role: CrewRole
     invited_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProjectOut(BaseModel):
@@ -64,8 +67,7 @@ class ProjectOut(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProjectStatusOut(BaseModel):

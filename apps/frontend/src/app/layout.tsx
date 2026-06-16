@@ -1,13 +1,28 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Meera_Inimai, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { AuthProvider } from "@/components/AuthProvider";
 import { ReactQueryProvider } from "@/components/ReactQueryProvider";
+import { AppTopDock } from "@/components/AppTopDock";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+});
+
+const meera = Meera_Inimai({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-meera",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
@@ -30,21 +45,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} antialiased`}>
-        <ReactQueryProvider>
-          {children}
-          <Toaster
-            theme="dark"
-            position="top-right"
-            toastOptions={{
-              style: {
-                background: "#111827",
-                border: "1px solid rgba(255,255,255,0.08)",
-                color: "#F9FAFB",
-              },
-            }}
-          />
-        </ReactQueryProvider>
+      <body className={`${inter.variable} ${meera.variable} ${jetbrainsMono.variable} antialiased`}>
+        <AuthProvider>
+          <ReactQueryProvider>
+            {children}
+            <AppTopDock />
+            <Toaster
+              theme="dark"
+              position="top-right"
+              toastOptions={{
+                style: {
+                  background: "#111827",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  color: "#F9FAFB",
+                },
+              }}
+            />
+          </ReactQueryProvider>
+        </AuthProvider>
       </body>
     </html>
   );

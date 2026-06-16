@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { supabase } from "@/lib/auth";
 
 const handler = NextAuth({
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "Supabase",

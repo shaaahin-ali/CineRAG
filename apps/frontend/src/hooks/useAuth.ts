@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { signIn as nextAuthSignIn, signOut as nextAuthSignOut, useSession } from "next-auth/react";
 import type { User, Session } from "@supabase/supabase-js";
-import { supabase, signIn, signUp, signOut } from "@/lib/auth";
+import { supabase, signUp, signOut as supabaseSignOut } from "@/lib/auth";
 
 interface AuthState {
   user: User | null;
@@ -12,7 +12,7 @@ interface AuthState {
 }
 
 export function useAuth() {
-  const router = useRouter();
+  const { status: nextAuthStatus } = useSession();
   const [state, setState] = useState<AuthState>({
     user: null,
     session: null,
@@ -20,7 +20,7 @@ export function useAuth() {
   });
 
   useEffect(() => {
-    // Get initial session
+    // Keep Supabase client in sync for any direct Supabase usage
     supabase.auth.getSession().then(({ data: { session } }) => {
       setState({
         user: session?.user ?? null,
@@ -29,7 +29,6 @@ export function useAuth() {
       });
     });
 
-    // Subscribe to auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -44,33 +43,59 @@ export function useAuth() {
   }, []);
 
   const login = useCallback(
-    async (email: string, password: string) => {
-      const data = await signIn(email, password);
-      router.push("/dashboard");
-      return data;
+    async (email: string, password: string, callbackUrl = "/dashboard") => {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        throw new Error("Invalid email or password");
+      }
+
+      // Let NextAuth set the session cookie and perform the redirect
+      const result = await nextAuthSignIn("credentials", {
+        email,
+        password,
+        callbackUrl,
+        redirect: true,
+      });
+
+      // redirect:true navigates away on success; only errors return here
+      if (result?.error) {
+        throw new Error("Invalid email or password");
+      }
     },
-    [router]
+    []
   );
 
   const register = useCallback(
-    async (email: string, password: string) => {
-      const data = await signUp(email, password);
-      router.push("/dashboard");
-      return data;
+    async (email: string, password: string, callbackUrl = "/dashboard") => {
+      await signUp(email, password);
+
+      const result = await nextAuthSignIn("credentials", {
+        email,
+        password,
+        callbackUrl,
+        redirect: true,
+      });
+
+      if (result?.error) {
+        throw new Error(
+          "Account created. Please check your email to confirm, then sign in."
+        );
+      }
     },
-    [router]
+    []
   );
 
   const logout = useCallback(async () => {
-    await signOut();
-    router.push("/");
-  }, [router]);
+    await supabaseSignOut();
+    await nextAuthSignOut({ redirect: false });
+    window.location.href = "/";
+  }, []);
 
   return {
     user: state.user,
     session: state.session,
-    loading: state.loading,
-    isAuthenticated: !!state.user,
+    loading: state.loading || nextAuthStatus === "loading",
+    isAuthenticated: nextAuthStatus === "authenticated",
     login,
     register,
     logout,
