@@ -112,7 +112,7 @@ async def stream_rag_response(
     chunks = await retrieve_chunks(
         project_id=project_id,
         query=expanded_query,
-        top_k=20,
+        top_k=8,
         rerank_top_n=5,
     )
 
@@ -124,20 +124,47 @@ async def stream_rag_response(
     # ── Step 4: Build prompt ───────────────────────────────────────────────────
     context = build_context_block(chunks)
 
+    # ── Language purity rules ──────────────────────────────────────────────────
+    # These rules appear BOTH in the system prompt (highest authority) AND in the
+    # user message (repeated instruction) so the model cannot "forget" mid-stream.
+    if effective_language == "ml":
+        # Triple-enforce Malayalam: constitutional block in system + command in user message
+        lang_tag = (
+            "══════════════════════════════════════════\n"
+            "LANGUAGE: MALAYALAM ONLY — ഉത്തരം മലയാളത്തിൽ ONLY\n"
+            "══════════════════════════════════════════\n"
+            "Write your ENTIRE answer in Malayalam script.\n"
+            "ഉത്തരം മുഴുവൻ മലയാളത്തിൽ മാത്രം എഴുതുക.\n"
+            "No English sentences allowed. English proper nouns (names/locations "
+            "from the screenplay) may be kept as-is in quotes.\n"
+            "══════════════════════════════════════════\n\n"
+        )
+    else:
+        # Triple-enforce English: constitutional block in system + command in user message
+        lang_tag = (
+            "══════════════════════════════════════════\n"
+            "LANGUAGE: ENGLISH ONLY\n"
+            "══════════════════════════════════════════\n"
+            "Write your ENTIRE answer in English only.\n"
+            "No Malayalam script allowed anywhere in the response.\n"
+            "══════════════════════════════════════════\n\n"
+        )
+
+    # System prompt: language constitutional block is baked in via language param
     system_prompt = (
-        MalayalamSystemPrompt.get_malayalam_context()
-        + "\n\n"
-        + MalayalamSystemPrompt.get_role_specific_prompt(user_role or "director")
+        MalayalamSystemPrompt.get_malayalam_context(language=effective_language)
+        + MalayalamSystemPrompt.get_role_specific_prompt(
+            user_role or "director", language=effective_language
+        )
     )
 
-    user_message = (
-        f"Query: {query}\n\n"
-        + (f"[Query is in Malayalam — respond in English with Malayalam terms where culturally relevant]\n\n"
-           if effective_language == "ml" else "")
-        + context
-    )
+    user_message = f"Query: {query}\n\n{lang_tag}{context}"
+
 
     # ── Step 5: Stream response ────────────────────────────────────────
+    # Malayalam needs more tokens per word than English (Unicode script)
+    max_tokens = 1200 if effective_language == "ml" else 800
+
     if settings.OPENROUTER_API_KEY:
         client = get_openrouter_client()
         
@@ -153,7 +180,7 @@ async def stream_rag_response(
             try:
                 response = await client.chat.completions.create(
                     model=model,
-                    max_tokens=2048,
+                    max_tokens=max_tokens,
                     messages=[
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_message}
@@ -164,6 +191,7 @@ async def stream_rag_response(
             except Exception as e:
                 logger.warning(f"OpenRouter model {model} failed: {e}")
                 continue
+
                 
         if not response:
             yield {"type": "token", "token": "\n\n[System] All free OpenRouter models are currently extremely busy and rate-limited. Please wait a minute and try again!"}

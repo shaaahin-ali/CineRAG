@@ -133,13 +133,11 @@ const Carousel = ({ items, initialScroll = 0 }: iCarouselProps) => {
 // ===== TestimonialCard Component =====
 const TestimonialCard = ({
   testimonial,
-  index,
   layout = false,
   onCardClose = () => {},
   backgroundImage = "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=800&auto=format&fit=crop",
 }: {
   testimonial: iTestimonial;
-  index: number;
   layout?: boolean;
   onCardClose?: () => void;
   backgroundImage?: string;
@@ -148,10 +146,10 @@ const TestimonialCard = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleExpand = () => setIsExpanded(true);
-  const handleCollapse = () => {
+  const handleCollapse = React.useCallback(() => {
     setIsExpanded(false);
     onCardClose();
-  };
+  }, [onCardClose]);
 
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
@@ -174,7 +172,7 @@ const TestimonialCard = ({
     }
     window.addEventListener("keydown", handleEscapeKey);
     return () => window.removeEventListener("keydown", handleEscapeKey);
-  }, [isExpanded]);
+  }, [isExpanded, handleCollapse]);
 
   useOutsideClick(containerRef, handleCollapse);
 

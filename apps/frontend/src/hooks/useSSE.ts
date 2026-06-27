@@ -11,7 +11,7 @@ interface UseSSEOptions {
   onToken: (token: string) => void;
   onCitation?: (citation: Citation) => void;
   onError?: (error: string) => void;
-  onComplete?: (queryId: string, latencyMs: number) => void;
+  onComplete?: () => void;
 }
 
 async function getAuthToken(): Promise<string | null> {
@@ -97,7 +97,7 @@ export function useSSE(options: UseSSEOptions) {
                 } else if (eventType === "citation") {
                   options.onCitation?.(data as Citation);
                 } else if (eventType === "done") {
-                  options.onComplete?.(data.query_id, data.latency_ms);
+                  options.onComplete?.();
                 } else if (eventType === "error") {
                   options.onError?.(data.error);
                 }

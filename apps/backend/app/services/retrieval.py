@@ -2,8 +2,10 @@
 Retrieval service — Pinecone vector search + Cohere reranking.
 """
 
+import asyncio
 import logging
 from typing import Any, Dict, List, Optional
+
 
 import cohere
 from pinecone import Pinecone
@@ -104,9 +106,11 @@ async def upsert_chunks(project_id: str, chunks: List[Dict[str, Any]]) -> int:
     """
     Upsert scene chunks into Pinecone.
     Each chunk must have: id, embedding, metadata (content, scene_number, etc.)
+    All batches are sent concurrently for maximum throughput.
     Returns number of vectors upserted.
     """
     index = get_pinecone_index()
+    loop = asyncio.get_event_loop()
 
     vectors = [
         {
@@ -127,16 +131,22 @@ async def upsert_chunks(project_id: str, chunks: List[Dict[str, Any]]) -> int:
         for chunk in chunks
     ]
 
-    # Batch upsert (Pinecone recommends batches of 100)
+    # Split into batches (Pinecone recommends 100 per request)
     batch_size = 100
-    total = 0
-    for i in range(0, len(vectors), batch_size):
-        batch = vectors[i : i + batch_size]
-        index.upsert(vectors=batch)
-        total += len(batch)
+    batches = [vectors[i : i + batch_size] for i in range(0, len(vectors), batch_size)]
+
+    async def _upsert_batch(batch):
+        """Run a single synchronous Pinecone upsert in a thread pool."""
+        await loop.run_in_executor(None, index.upsert, batch)
+        return len(batch)
+
+    # Fire all batches concurrently
+    counts = await asyncio.gather(*[_upsert_batch(b) for b in batches])
+    total = sum(counts)
 
     logger.info(f"Upserted {total} vectors for project {project_id}")
     return total
+
 
 
 async def delete_project_vectors(project_id: str) -> None:

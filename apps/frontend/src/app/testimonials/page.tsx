@@ -50,11 +50,10 @@ const testimonials: iTestimonial[] = [
   },
 ];
 
-const cards = testimonials.map((t, index) => (
+const cards = testimonials.map((t) => (
   <TestimonialCard
     key={t.name}
     testimonial={t}
-    index={index}
     backgroundImage="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=800&auto=format&fit=crop"
   />
 ));

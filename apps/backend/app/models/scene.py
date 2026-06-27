@@ -43,3 +43,13 @@ class CharacterOut(BaseModel):
     name: str
     scene_count: int
     scenes: List[int]  # scene numbers
+
+
+class SceneImageOut(BaseModel):
+    """AI-generated image record for a scene."""
+    scene_number: int
+    image_url: str
+    image_prompt: Optional[str] = None
+    generated_at: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True)

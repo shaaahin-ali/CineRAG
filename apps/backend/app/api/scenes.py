@@ -7,13 +7,14 @@ Routes:
 """
 
 import logging
-from typing import List
+from typing import Any, Dict, List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Request, status
 
 from app.core.security import extract_token, get_current_user_id
-from app.models.scene import CharacterOut, SceneOut
+from app.models.scene import CharacterOut, SceneImageOut, SceneOut
+from app.services.scene_images import MAX_SCENES_TO_GENERATE, get_image_progress
 from app.services.storage import SupabaseClient
 
 logger = logging.getLogger(__name__)
@@ -76,3 +77,51 @@ async def list_characters(request: Request, project_id: UUID) -> List[CharacterO
         CharacterOut(name=name, scene_count=len(scenes), scenes=sorted(scenes))
         for name, scenes in sorted(char_map.items())
     ]
+
+
+@router.get("/projects/{project_id}/scene-images", response_model=List[SceneImageOut])
+async def list_scene_images(
+    request: Request,
+    project_id: UUID,
+) -> List[SceneImageOut]:
+    """
+    Return all AI-generated scene images for a project.
+    Images are generated in background after screenplay upload.
+    """
+    token = extract_token(request)
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    db = SupabaseClient()
+    result = (
+        db.table("scene_images")
+        .select("scene_number,image_url,image_prompt,generated_at")
+        .eq("project_id", str(project_id))
+        .order("scene_number")
+        .execute()
+    )
+
+    return [SceneImageOut(**row) for row in (result.data or [])]
+
+
+@router.get("/projects/{project_id}/image-progress")
+async def get_image_generation_progress(
+    request: Request,
+    project_id: UUID,
+) -> Dict[str, Any]:
+    """
+    Return real-time image generation progress for this project.
+    Response: { generated: int, total: int, status: 'generating'|'complete'|'error' }
+    """
+    token = extract_token(request)
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    # Get total scene count for this project
+    db = SupabaseClient()
+    proj = db.table("projects").select("scene_count").eq("id", str(project_id)).execute()
+    total_scenes: int = 0
+    if proj.data:
+        total_scenes = proj.data[0].get("scene_count") or 0
+
+    return get_image_progress(str(project_id), total_scenes)

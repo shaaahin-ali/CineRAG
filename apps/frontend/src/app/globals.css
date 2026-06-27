@@ -236,6 +236,20 @@ body {
   100% { background-position: 1000px 0; }
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-ticker {
+  animation: ticker linear infinite;
+  will-change: transform;
+}
+
 /* ── Focus visible ────────────────────────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid var(--accent-gold);

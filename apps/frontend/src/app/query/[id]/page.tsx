@@ -2,12 +2,16 @@
 
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Film, ArrowLeft, BookOpen, Users, X, ChevronDown, Send } from "lucide-react";
+import { Film, ArrowLeft, BookOpen, Users, X, ChevronDown, Send, Network, Clapperboard, Video, Radio } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { QueryInterface } from "@/components/QueryInterface";
 import { QueryHistory } from "@/components/QueryHistory";
+import { CharacterGraphPanel } from "@/components/CharacterGraphPanel";
+import { SceneStoryboardPanel } from "@/components/SceneStoryboardPanel";
+import { SceneVideosPanel } from "@/components/SceneVideosPanel";
+import { CinematicNarratorPanel } from "@/components/CinematicNarratorPanel";
 import { api } from "@/lib/api-client";
 import { Project } from "@/types";
 
@@ -27,6 +31,10 @@ const CREW_ROLES = [
 
 export default function QueryPage({ params }: QueryPageProps) {
   const [showShare, setShowShare] = useState(false);
+  const [showGraph, setShowGraph] = useState(false);
+  const [showStoryboard, setShowStoryboard] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
+  const [showNarrator, setShowNarrator] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<string>("viewer");
 
@@ -95,6 +103,98 @@ export default function QueryPage({ params }: QueryPageProps) {
               <BookOpen className="w-3.5 h-3.5" />
               {project.scene_count} scenes · {project.page_count} pages
             </div>
+          )}
+
+          {/* Character Graph button */}
+          {project && project.status === "ready" && (
+            <button
+              id="character-graph-btn"
+              onClick={() => setShowGraph(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+              style={{
+                background: "rgba(139,92,246,0.1)",
+                border: "1px solid rgba(139,92,246,0.25)",
+                color: "#A78BFA",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(139,92,246,0.18)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(139,92,246,0.1)";
+              }}
+            >
+              <Network className="w-3.5 h-3.5" />
+              Cast Graph
+            </button>
+          )}
+
+          {/* Scene Storyboard button */}
+          {project && project.status === "ready" && (
+            <button
+              id="scene-storyboard-btn"
+              onClick={() => setShowStoryboard(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+              style={{
+                background: "rgba(253,176,34,0.08)",
+                border: "1px solid rgba(253,176,34,0.22)",
+                color: "#FDB022",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(253,176,34,0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(253,176,34,0.08)";
+              }}
+            >
+              <Clapperboard className="w-3.5 h-3.5" />
+              Storyboard
+            </button>
+          )}
+
+          {/* Scene Video Preview button */}
+          {project && project.status === "ready" && (
+            <button
+              id="scene-video-btn"
+              onClick={() => setShowVideo(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+              style={{
+                background: "rgba(96,165,250,0.08)",
+                border: "1px solid rgba(96,165,250,0.22)",
+                color: "#60A5FA",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(96,165,250,0.16)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(96,165,250,0.08)";
+              }}
+            >
+              <Video className="w-3.5 h-3.5" />
+              Scene Video
+            </button>
+          )}
+
+          {/* Cinematic Narrator button */}
+          {project && project.status === "ready" && (
+            <button
+              id="cinematic-narrator-btn"
+              onClick={() => setShowNarrator(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+              style={{
+                background: "rgba(167,139,250,0.08)",
+                border: "1px solid rgba(167,139,250,0.22)",
+                color: "#A78BFA",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(167,139,250,0.16)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(167,139,250,0.08)";
+              }}
+            >
+              <Radio className="w-3.5 h-3.5" />
+              Narrator
+            </button>
           )}
 
           {/* Share button */}
@@ -283,6 +383,34 @@ export default function QueryPage({ params }: QueryPageProps) {
           </div>
         </div>
       </div>
+
+      {/* ── Character Graph Slide-out Panel ──────────────────────────────────── */}
+      <CharacterGraphPanel
+        projectId={params.id}
+        isOpen={showGraph}
+        onClose={() => setShowGraph(false)}
+      />
+
+      {/* ── Scene Storyboard Panel ────────────────────────────────────────────────── */}
+      <SceneStoryboardPanel
+        projectId={params.id}
+        isOpen={showStoryboard}
+        onClose={() => setShowStoryboard(false)}
+      />
+
+      {/* ── Scene Video Preview Panel ────────────────────────────────────── */}
+      <SceneVideosPanel
+        projectId={params.id}
+        isOpen={showVideo}
+        onClose={() => setShowVideo(false)}
+      />
+
+      {/* ── Cinematic Narrator Panel ──────────────────────────────────────── */}
+      <CinematicNarratorPanel
+        projectId={params.id}
+        isOpen={showNarrator}
+        onClose={() => setShowNarrator(false)}
+      />
     </main>
   );
 }

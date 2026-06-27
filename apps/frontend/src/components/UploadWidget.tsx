@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileText, CheckCircle, AlertCircle, X } from "lucide-react";
+import { Upload, FileText, CheckCircle, AlertCircle, X, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-client";
+import { getSession } from "next-auth/react";
 
 interface UploadWidgetProps {
   projectId: string;
@@ -14,11 +15,93 @@ interface UploadWidgetProps {
 
 type UploadState = "idle" | "dragging" | "uploading" | "success" | "error";
 
+/** Maps backend step names → { label, progress% } */
+const STEP_MAP: Record<string, { label: string; progress: number }> = {
+  extracting:     { label: "Reading file…",                progress: 8  },
+  extracted:      { label: "Text extracted",               progress: 14 },
+  parsing:        { label: "Parsing scenes…",              progress: 20 },
+  parsed:         { label: "Scenes identified",            progress: 28 },
+  emotions:       { label: "Analysing emotions…",          progress: 36 },
+  emotions_done:  { label: "Emotions detected",            progress: 44 },
+  chunking:       { label: "Chunking content…",            progress: 50 },
+  embedding:      { label: "Generating embeddings…",       progress: 58 },
+  embedding_done: { label: "Embeddings ready",             progress: 70 },
+  indexing:       { label: "Indexing into Pinecone…",      progress: 78 },
+  indexing_done:  { label: "Vectors indexed",              progress: 86 },
+  saving:         { label: "Saving to database…",          progress: 92 },
+  images:         { label: "Queuing scene images…",        progress: 96 },
+  ready:          { label: "Pipeline complete!",           progress: 100 },
+  error:          { label: "Processing failed",            progress: 100 },
+};
+
 export function UploadWidget({ projectId, onUploadStart, onUploadComplete }: UploadWidgetProps) {
   const [state, setState] = useState<UploadState>("idle");
   const [fileName, setFileName] = useState("");
   const [error, setError] = useState("");
   const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState("Uploading screenplay…");
+  const [fromCache, setFromCache] = useState(false);
+  const eventSourceRef = useRef<EventSource | null>(null);
+
+  // Clean up SSE on unmount
+  useEffect(() => {
+    return () => {
+      eventSourceRef.current?.close();
+    };
+  }, []);
+
+  const openProgressStream = useCallback(
+    async (pid: string) => {
+      // Get auth token for the SSE request
+      const session = await getSession();
+      const token = (session?.user as { token?: string })?.token;
+      if (!token) return;
+
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      // EventSource doesn't support custom headers; pass token via query param
+      const url = `${API_BASE}/api/v1/projects/${pid}/upload/progress?token=${token}`;
+
+      const es = new EventSource(url);
+      eventSourceRef.current = es;
+
+      es.onmessage = (e) => {
+        try {
+          const { step, detail } = JSON.parse(e.data) as { step: string; detail: string };
+          const mapped = STEP_MAP[step];
+          if (mapped) {
+            setProgress(mapped.progress);
+            setProgressLabel(mapped.label + (detail ? ` — ${detail}` : ""));
+          }
+
+          if (step === "ready") {
+            es.close();
+            setProgress(100);
+            setState("success");
+            toast.success("Screenplay indexed!", {
+              description: "All scenes are ready to query.",
+            });
+            onUploadComplete?.();
+          } else if (step === "error") {
+            es.close();
+            setError(detail || "Pipeline failed");
+            setState("error");
+            toast.error("Indexing failed", { description: detail });
+          }
+        } catch {
+          // Ignore malformed events
+        }
+      };
+
+      es.addEventListener("done", () => {
+        es.close();
+      });
+
+      es.onerror = () => {
+        es.close();
+      };
+    },
+    [onUploadComplete]
+  );
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -39,32 +122,43 @@ export function UploadWidget({ projectId, onUploadStart, onUploadComplete }: Upl
 
       setFileName(file.name);
       setState("uploading");
-      setProgress(0);
+      setProgress(4);
+      setProgressLabel("Uploading to server…");
+      setFromCache(false);
       onUploadStart?.();
 
-      // Fake progress while uploading
-      const progressInterval = setInterval(() => {
-        setProgress((p) => Math.min(p + 10, 90));
-      }, 300);
-
       try {
-        await api.upload(`/api/v1/projects/${projectId}/upload`, file);
-        clearInterval(progressInterval);
-        setProgress(100);
-        setState("success");
-        toast.success("Screenplay uploaded! Indexing scenes…", {
-          description: "This may take 1–2 minutes.",
-        });
-        onUploadComplete?.();
+        const result = await api.upload<{ status: string; message: string }>(
+          `/api/v1/projects/${projectId}/upload`,
+          file
+        );
+
+        if (result.status === "ready") {
+          // Cache hit — already indexed
+          setProgress(100);
+          setProgressLabel("Loaded from cache");
+          setFromCache(true);
+          setState("success");
+          toast.success("Loaded from cache!", {
+            description: "This screenplay was already indexed.",
+          });
+          onUploadComplete?.();
+          return;
+        }
+
+        // Start SSE stream for live progress
+        setProgress(6);
+        setProgressLabel("Pipeline starting…");
+        await openProgressStream(projectId);
       } catch (err: unknown) {
-        clearInterval(progressInterval);
+        eventSourceRef.current?.close();
         const msg = err instanceof Error ? err.message : "Upload failed";
         setError(msg);
         setState("error");
         toast.error("Upload failed", { description: msg });
       }
     },
-    [projectId, onUploadStart, onUploadComplete]
+    [projectId, onUploadStart, onUploadComplete, openProgressStream]
   );
 
   const onDrop = useCallback(
@@ -86,10 +180,13 @@ export function UploadWidget({ projectId, onUploadStart, onUploadComplete }: Upl
   );
 
   const reset = () => {
+    eventSourceRef.current?.close();
     setState("idle");
     setFileName("");
     setError("");
     setProgress(0);
+    setProgressLabel("Uploading screenplay…");
+    setFromCache(false);
   };
 
   const borderColor =
@@ -151,15 +248,15 @@ export function UploadWidget({ projectId, onUploadStart, onUploadComplete }: Upl
           <motion.div key="uploading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <FileText className="mx-auto mb-3 h-8 w-8 text-amber-400/60" />
             <p className="text-sm font-medium text-white">{fileName}</p>
-            <p className="mt-1 text-xs text-zinc-600">
-              {progress < 100 ? "Uploading screenplay…" : "Processing…"}
+            <p className="mt-1 text-xs text-zinc-500 min-h-[1rem] transition-all duration-300">
+              {progressLabel}
             </p>
             <div className="mx-auto mt-4 max-w-xs">
               <div className="h-[3px] overflow-hidden rounded-full bg-white/[0.04]">
                 <motion.div
                   className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-600"
                   animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
                 />
               </div>
               <p className="mt-2 text-[11px] text-amber-400/60">{progress}%</p>
@@ -169,9 +266,16 @@ export function UploadWidget({ projectId, onUploadStart, onUploadComplete }: Upl
           <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
             <CheckCircle className="mx-auto mb-3 h-10 w-10 text-emerald-400" />
             <p className="text-sm font-semibold text-white">Uploaded successfully</p>
-            <p className="mt-1 text-xs text-zinc-600">
-              Scenes are being indexed. Check project status for updates.
-            </p>
+            {fromCache ? (
+              <p className="mt-1 text-xs text-zinc-500 flex items-center justify-center gap-1">
+                <Zap className="w-3 h-3 text-amber-400" />
+                Loaded instantly from cache
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-zinc-600">
+                Scenes indexed and ready to query.
+              </p>
+            )}
           </motion.div>
         ) : (
           <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>

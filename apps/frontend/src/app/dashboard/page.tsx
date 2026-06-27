@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import {
-  ArrowRight,
   BarChart3,
   Film,
   Layers3,
@@ -13,7 +12,6 @@ import {
   Sparkles,
   X,
   Upload,
-  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -29,10 +27,7 @@ import { Footer } from "@/components/ui/footer-section";
 /*  Animation variants                                                       */
 /* ────────────────────────────────────────────────────────────────────────── */
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 14 },
-  show: { opacity: 1, y: 0 },
-} as const;
+
 
 const stagger = {
   hidden: {},

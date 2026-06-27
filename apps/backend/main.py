@@ -4,14 +4,23 @@ CinePhile Malayalam Edition — FastAPI Entry Point
 """
 
 import logging
+import sys
 from contextlib import asynccontextmanager
+
+# ── Windows asyncio DNS fix ────────────────────────────────────────────────────
+# ProactorEventLoop (Windows default) breaks DNS resolution in async HTTP clients
+# (httpx, aiohttp). SelectorEventLoop handles DNS correctly on all platforms.
+if sys.platform == "win32":
+    import asyncio
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+# ──────────────────────────────────────────────────────────────────────────────
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from app.api import health, projects, query, scenes, upload
+from app.api import graph, graph_explain, health, narrator, projects, query, scenes, upload, video
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.security import limiter
@@ -66,6 +75,10 @@ app.include_router(projects.router, prefix="/api/v1", tags=["projects"])
 app.include_router(upload.router, prefix="/api/v1", tags=["upload"])
 app.include_router(query.router, prefix="/api/v1", tags=["query"])
 app.include_router(scenes.router, prefix="/api/v1", tags=["scenes"])
+app.include_router(graph.router, prefix="/api/v1", tags=["graph"])
+app.include_router(graph_explain.router, prefix="/api/v1", tags=["graph"])
+app.include_router(video.router, prefix="/api/v1", tags=["video"])
+app.include_router(narrator.router, prefix="/api/v1", tags=["narrator"])
 
 if __name__ == "__main__":
     import uvicorn
