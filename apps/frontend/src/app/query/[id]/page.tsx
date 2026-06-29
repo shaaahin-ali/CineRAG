@@ -1,8 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Film, ArrowLeft, BookOpen, Users, X, ChevronDown, Send, Network, Clapperboard, Video, Radio } from "lucide-react";
+import {
+  Film,
+  ArrowLeft,
+  BookOpen,
+  Users,
+  X,
+  ChevronDown,
+  Send,
+  Network,
+  Clapperboard,
+  Video,
+  Radio,
+} from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -105,119 +117,116 @@ export default function QueryPage({ params }: QueryPageProps) {
             </div>
           )}
 
-          {/* Character Graph button */}
+          {/* ── Feature toolbar — clean pills with labels ── */}
           {project && project.status === "ready" && (
-            <button
-              id="character-graph-btn"
-              onClick={() => setShowGraph(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-              style={{
-                background: "rgba(139,92,246,0.1)",
-                border: "1px solid rgba(139,92,246,0.25)",
-                color: "#A78BFA",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(139,92,246,0.18)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(139,92,246,0.1)";
-              }}
-            >
-              <Network className="w-3.5 h-3.5" />
-              Cast Graph
-            </button>
-          )}
+            <>
+              <div className="hidden md:block w-px h-5 mx-1" style={{ background: "rgba(255,255,255,0.08)" }} />
 
-          {/* Scene Storyboard button */}
-          {project && project.status === "ready" && (
-            <button
-              id="scene-storyboard-btn"
-              onClick={() => setShowStoryboard(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-              style={{
-                background: "rgba(253,176,34,0.08)",
-                border: "1px solid rgba(253,176,34,0.22)",
-                color: "#FDB022",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(253,176,34,0.15)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(253,176,34,0.08)";
-              }}
-            >
-              <Clapperboard className="w-3.5 h-3.5" />
-              Storyboard
-            </button>
-          )}
+              {/* Cast Graph */}
+              <button
+                id="character-graph-btn"
+                onClick={() => setShowGraph(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                style={{
+                  background: showGraph ? "rgba(139,92,246,0.18)" : "rgba(139,92,246,0.08)",
+                  border: `1px solid ${showGraph ? "rgba(139,92,246,0.5)" : "rgba(139,92,246,0.2)"}`,
+                  color: "#A78BFA",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(139,92,246,0.16)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = showGraph ? "rgba(139,92,246,0.18)" : "rgba(139,92,246,0.08)";
+                }}
+              >
+                <Network className="w-3.5 h-3.5" />
+                <span className="hidden lg:inline">Cast Graph</span>
+              </button>
 
-          {/* Scene Video Preview button */}
-          {project && project.status === "ready" && (
-            <button
-              id="scene-video-btn"
-              onClick={() => setShowVideo(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-              style={{
-                background: "rgba(96,165,250,0.08)",
-                border: "1px solid rgba(96,165,250,0.22)",
-                color: "#60A5FA",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(96,165,250,0.16)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(96,165,250,0.08)";
-              }}
-            >
-              <Video className="w-3.5 h-3.5" />
-              Scene Video
-            </button>
-          )}
+              {/* Storyboard */}
+              <button
+                id="scene-storyboard-btn"
+                onClick={() => setShowStoryboard(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                style={{
+                  background: showStoryboard ? "rgba(253,176,34,0.15)" : "rgba(253,176,34,0.06)",
+                  border: `1px solid ${showStoryboard ? "rgba(253,176,34,0.5)" : "rgba(253,176,34,0.18)"}`,
+                  color: "#FDB022",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(253,176,34,0.14)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = showStoryboard ? "rgba(253,176,34,0.15)" : "rgba(253,176,34,0.06)";
+                }}
+              >
+                <Clapperboard className="w-3.5 h-3.5" />
+                <span className="hidden lg:inline">Storyboard</span>
+              </button>
 
-          {/* Cinematic Narrator button */}
-          {project && project.status === "ready" && (
-            <button
-              id="cinematic-narrator-btn"
-              onClick={() => setShowNarrator(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-              style={{
-                background: "rgba(167,139,250,0.08)",
-                border: "1px solid rgba(167,139,250,0.22)",
-                color: "#A78BFA",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(167,139,250,0.16)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(167,139,250,0.08)";
-              }}
-            >
-              <Radio className="w-3.5 h-3.5" />
-              Narrator
-            </button>
-          )}
+              {/* Scene Video */}
+              <button
+                id="scene-video-btn"
+                onClick={() => setShowVideo(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                style={{
+                  background: showVideo ? "rgba(96,165,250,0.16)" : "rgba(96,165,250,0.06)",
+                  border: `1px solid ${showVideo ? "rgba(96,165,250,0.5)" : "rgba(96,165,250,0.18)"}`,
+                  color: "#60A5FA",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(96,165,250,0.14)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = showVideo ? "rgba(96,165,250,0.16)" : "rgba(96,165,250,0.06)";
+                }}
+              >
+                <Video className="w-3.5 h-3.5" />
+                <span className="hidden lg:inline">Scene Video</span>
+              </button>
 
-          {/* Share button */}
-          {project && (
-            <button
-              id="share-project-btn"
-              onClick={() => setShowShare(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-              style={{
-                background: "rgba(253,176,34,0.1)",
-                border: "1px solid rgba(253,176,34,0.25)",
-                color: "var(--accent-gold)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(253,176,34,0.18)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(253,176,34,0.1)";
-              }}
-            >
-              <Users className="w-3.5 h-3.5" />
-              Share
-            </button>
+              {/* Narrator */}
+              <button
+                id="cinematic-narrator-btn"
+                onClick={() => setShowNarrator(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                style={{
+                  background: showNarrator ? "rgba(52,211,153,0.16)" : "rgba(52,211,153,0.06)",
+                  border: `1px solid ${showNarrator ? "rgba(52,211,153,0.5)" : "rgba(52,211,153,0.18)"}`,
+                  color: "#34D399",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(52,211,153,0.14)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = showNarrator ? "rgba(52,211,153,0.16)" : "rgba(52,211,153,0.06)";
+                }}
+              >
+                <Radio className="w-3.5 h-3.5" />
+                <span className="hidden lg:inline">Narrator</span>
+              </button>
+
+              {/* Share */}
+              <button
+                id="share-project-btn"
+                onClick={() => setShowShare(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                style={{
+                  background: "rgba(253,176,34,0.08)",
+                  border: "1px solid rgba(253,176,34,0.2)",
+                  color: "var(--accent-gold)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(253,176,34,0.16)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(253,176,34,0.08)";
+                }}
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span className="hidden lg:inline">Share</span>
+              </button>
+            </>
           )}
         </div>
       </nav>

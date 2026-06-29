@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import {
   BarChart3,
   Film,
@@ -13,6 +14,14 @@ import {
   X,
   Upload,
   BookOpen,
+  Video,
+  Network,
+  Clapperboard,
+  Radio,
+  Users,
+  Wand2,
+  FileUp,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -28,8 +37,6 @@ import { Footer } from "@/components/ui/footer-section";
 /* ────────────────────────────────────────────────────────────────────────── */
 /*  Animation variants                                                       */
 /* ────────────────────────────────────────────────────────────────────────── */
-
-
 
 const stagger = {
   hidden: {},
@@ -53,6 +60,14 @@ export default function DashboardPage() {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
   const currentUserId = (session?.user as { id?: string } | undefined)?.id;
+  const searchParams = useSearchParams();
+
+  // Auto-open Screenplay Assist from bottom dock (?assist=1)
+  useEffect(() => {
+    if (searchParams.get("assist") === "1") {
+      setShowScreenplayAssist(true);
+    }
+  }, [searchParams]);
 
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["projects"],
@@ -154,37 +169,28 @@ export default function DashboardPage() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {/* Screenplay Assist button */}
+            {/* Screenplay Assist */}
             <button
               type="button"
               id="header-screenplay-assist"
               onClick={() => setShowScreenplayAssist(true)}
+              className="hidden items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 hover:shadow-lg sm:inline-flex"
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 7,
-                borderRadius: 9999,
-                background: "rgba(167,139,250,0.1)",
-                border: "1px solid rgba(167,139,250,0.25)",
-                padding: "10px 18px",
+                background: "rgba(167,139,250,0.08)",
+                border: "1px solid rgba(167,139,250,0.2)",
                 color: "#A78BFA",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.15s",
-                whiteSpace: "nowrap",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(167,139,250,0.18)";
-                e.currentTarget.style.borderColor = "rgba(167,139,250,0.45)";
+                e.currentTarget.style.background = "rgba(167,139,250,0.14)";
+                e.currentTarget.style.borderColor = "rgba(167,139,250,0.4)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(167,139,250,0.1)";
-                e.currentTarget.style.borderColor = "rgba(167,139,250,0.25)";
+                e.currentTarget.style.background = "rgba(167,139,250,0.08)";
+                e.currentTarget.style.borderColor = "rgba(167,139,250,0.2)";
               }}
             >
-              <BookOpen className="h-4 w-4" />
-              Screenplay Assist
+              <Wand2 className="h-4 w-4" />
+              Write screenplay
             </button>
 
             <button
@@ -466,7 +472,7 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : projects.length === 0 ? (
-            /* Empty state */
+            /* ── Empty state — two clean paths ── */
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -477,15 +483,32 @@ export default function DashboardPage() {
               </div>
               <h3 className="mt-6 text-xl font-semibold text-white">No projects yet</h3>
               <p className="mx-auto mt-2 max-w-sm text-sm text-zinc-600">
-                Create your first screenplay project to begin uploading scripts and querying scenes with AI.
+                Upload a screenplay to unlock AI scene analysis, character graphs, and video previews — or write one from scratch.
               </p>
-              <button
-                onClick={() => setShowCreate(true)}
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:bg-zinc-200"
-              >
-                <Sparkles className="h-4 w-4" />
-                Create first project
-              </button>
+
+              <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
+                <button
+                  id="empty-create-project"
+                  onClick={() => setShowCreate(true)}
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:bg-zinc-200"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Upload screenplay
+                </button>
+                <button
+                  id="empty-screenplay-assist"
+                  onClick={() => setShowScreenplayAssist(true)}
+                  className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5"
+                  style={{
+                    background: "rgba(167,139,250,0.08)",
+                    border: "1px solid rgba(167,139,250,0.2)",
+                    color: "#A78BFA",
+                  }}
+                >
+                  <Wand2 className="h-4 w-4" />
+                  Write with AI
+                </button>
+              </div>
             </motion.div>
           ) : (
             /* Project cards */

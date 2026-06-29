@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   LogOut,
   UserCircle2,
+  Wand2,
 } from "lucide-react";
 
 export function AppTopDock() {
@@ -40,6 +41,12 @@ export function AppTopDock() {
     },
     ...(isAuthenticated
       ? [
+          {
+            id: "screenplay",
+            label: "Write",
+            icon: <Wand2 />,
+            onClick: () => router.push("/dashboard?assist=1"),
+          },
           {
             id: "profile",
             label: "Profile",

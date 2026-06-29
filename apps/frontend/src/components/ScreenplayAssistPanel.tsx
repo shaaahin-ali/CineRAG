@@ -70,6 +70,24 @@ const LANGUAGES = [
   { value: "tamil", label: "Tamil" },
 ];
 
+const EXAMPLE_IDEAS = [
+  {
+    emoji: "🕵️",
+    label: "Kerala detective noir",
+    text: "A retired police detective in 1970s Kochi is pulled back into a cold case when a mysterious letter arrives at his door. The letter contains clues pointing to a powerful politician's dark secret. As he investigates, he discovers the case is linked to his own family's past. The detective must choose between exposing the truth and protecting the people he loves.",
+  },
+  {
+    emoji: "🚂",
+    label: "Two strangers on a train",
+    text: "Two strangers — a cynical software engineer returning from a failed marriage and a free-spirited artist running from her conservative family — meet on an overnight train from Mumbai to Kerala. Over 18 hours of conversation, chai, and shared silences, they discover they are heading to the same small village for very different reasons. Their lives become entangled in unexpected ways.",
+  },
+  {
+    emoji: "🎵",
+    label: "Musician's comeback",
+    text: "A once-celebrated Carnatic vocalist who lost her voice in a tragic accident five years ago now teaches music in a small town. When a documentary filmmaker discovers her story, he convinces her to attempt a comeback performance at the annual temple festival. But to sing again, she must confront the painful memories of the night she lost everything — and forgive the person responsible.",
+  },
+];
+
 /* ─────────────────────────────────────────────────────────────────────────── */
 /*  PDF Download Helper                                                         */
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -594,6 +612,53 @@ export function ScreenplayAssistPanel({ isOpen, onClose }: ScreenplayAssistPanel
                           <Wand2 size={14} style={{ color: "#A78BFA" }} />
                           Your Story Idea *
                         </label>
+
+                        {/* Example story chips */}
+                        {!storyIdea && (
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: 6,
+                              flexWrap: "wrap",
+                              marginBottom: 10,
+                            }}
+                          >
+
+                            {EXAMPLE_IDEAS.map((ex) => (
+                              <button
+                                key={ex.label}
+                                type="button"
+                                onClick={() => setStoryIdea(ex.text)}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 4,
+                                  padding: "4px 10px",
+                                  borderRadius: 8,
+                                  background: "rgba(167,139,250,0.06)",
+                                  border: "1px solid rgba(167,139,250,0.15)",
+                                  color: "rgba(167,139,250,0.7)",
+                                  fontSize: 10,
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                  transition: "all 0.12s",
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = "rgba(167,139,250,0.12)";
+                                  e.currentTarget.style.borderColor = "rgba(167,139,250,0.35)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = "rgba(167,139,250,0.06)";
+                                  e.currentTarget.style.borderColor = "rgba(167,139,250,0.15)";
+                                }}
+                              >
+                                <span>{ex.emoji}</span>
+                                {ex.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
                         <textarea
                           ref={textareaRef}
                           id="sa-story-idea"
@@ -601,7 +666,7 @@ export function ScreenplayAssistPanel({ isOpen, onClose }: ScreenplayAssistPanel
                           value={storyIdea}
                           onChange={(e) => setStoryIdea(e.target.value)}
                           rows={6}
-                          placeholder="Describe your story — the main character, their goal, the conflict, the world. Include plot beats, themes, or any specific moments you have in mind. The more detail you give, the better the screenplay..."
+                          placeholder={"Example: A retired detective in 1970s Kochi receives a mysterious letter that pulls him back into a cold case connected to a powerful politician...\n\nTip: The more detail you give, the better the screenplay. Include character names, key scenes, conflicts, and the emotional core of your story."}
                           style={{
                             ...inputStyle,
                             width: "100%",
