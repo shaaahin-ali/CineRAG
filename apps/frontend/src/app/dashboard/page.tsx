@@ -12,12 +12,14 @@ import {
   Sparkles,
   X,
   Upload,
+  BookOpen,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProjectCard } from "@/components/ProjectCard";
 import { UploadWidget } from "@/components/UploadWidget";
+import { ScreenplayAssistPanel } from "@/components/ScreenplayAssistPanel";
 import { api } from "@/lib/api-client";
 import { projectSchema, ProjectInput } from "@/lib/validators";
 import { Project } from "@/types";
@@ -47,6 +49,7 @@ export default function DashboardPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [uploadProjectId, setUploadProjectId] = useState<string | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [showScreenplayAssist, setShowScreenplayAssist] = useState(false);
   const queryClient = useQueryClient();
   const { data: session } = useSession();
   const currentUserId = (session?.user as { id?: string } | undefined)?.id;
@@ -150,15 +153,50 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <button
-            type="button"
-            id="header-create-project"
-            onClick={() => setShowCreate(true)}
-            className="hidden items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:bg-zinc-200 hover:shadow-lg hover:shadow-white/5 sm:inline-flex"
-          >
-            <Plus className="h-4 w-4" />
-            New project
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {/* Screenplay Assist button */}
+            <button
+              type="button"
+              id="header-screenplay-assist"
+              onClick={() => setShowScreenplayAssist(true)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 7,
+                borderRadius: 9999,
+                background: "rgba(167,139,250,0.1)",
+                border: "1px solid rgba(167,139,250,0.25)",
+                padding: "10px 18px",
+                color: "#A78BFA",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.15s",
+                whiteSpace: "nowrap",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(167,139,250,0.18)";
+                e.currentTarget.style.borderColor = "rgba(167,139,250,0.45)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(167,139,250,0.1)";
+                e.currentTarget.style.borderColor = "rgba(167,139,250,0.25)";
+              }}
+            >
+              <BookOpen className="h-4 w-4" />
+              Screenplay Assist
+            </button>
+
+            <button
+              type="button"
+              id="header-create-project"
+              onClick={() => setShowCreate(true)}
+              className="hidden items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:bg-zinc-200 hover:shadow-lg hover:shadow-white/5 sm:inline-flex"
+            >
+              <Plus className="h-4 w-4" />
+              New project
+            </button>
+          </div>
         </motion.header>
 
         {/* ── Stats strip ────────────────────────────────────────────── */}
@@ -474,6 +512,12 @@ export default function DashboardPage() {
         </section>
       </div>
       <Footer />
+
+      {/* ── Screenplay Assist Panel ── */}
+      <ScreenplayAssistPanel
+        isOpen={showScreenplayAssist}
+        onClose={() => setShowScreenplayAssist(false)}
+      />
     </main>
   );
 }

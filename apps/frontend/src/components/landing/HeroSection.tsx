@@ -13,12 +13,24 @@ export function HeroSection() {
   return (
     <section className="relative z-10 flex flex-col items-center justify-center w-full min-h-[92vh] pt-28 pb-20 px-6">
 
+      {/* Shahin Ali Product Badge */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: -10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-8"
+      >
+        <span className="inline-flex items-center gap-2 px-4 py-1.5 text-[10px] uppercase tracking-[0.25em] font-semibold text-zinc-300 bg-zinc-900/50 border border-zinc-800/80 rounded-full backdrop-blur-sm shadow-xl">
+          ✨ A Shahin Ali Product
+        </span>
+      </motion.div>
+
       {/* Eyebrow */}
       <motion.p
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="text-[11px] uppercase tracking-[0.4em] text-zinc-600 mb-10 font-mono"
+        className="text-[11px] uppercase tracking-[0.4em] text-zinc-600 mb-8 font-mono"
       >
         AI for Mollywood Screenplays
       </motion.p>

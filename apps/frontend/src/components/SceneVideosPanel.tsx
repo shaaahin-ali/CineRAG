@@ -19,6 +19,11 @@ import {
   Mic,
   MicOff,
   Volume2,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+  Film,
+  MessageSquare,
 } from "lucide-react";
 import { api } from "@/lib/api-client";
 
@@ -39,8 +44,10 @@ interface VideoJob {
     mood?: string;
     characters?: string[];
     visual_style?: string;
+    scene_summary?: string;
   } | null;
   extra_prompt: string | null;
+  scene_summary: string | null;  // AI-distilled visual peak moment (theater overlay)
   created_at: string | null;
   updated_at: string | null;
 }
@@ -603,6 +610,333 @@ function VideoJobCard({
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
+/*  Theater Mode — fullscreen single video player with Prev / Next navigation  */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+function VideoTheater({
+  jobs,
+  initialIndex,
+  onClose,
+}: {
+  jobs: VideoJob[];
+  initialIndex: number;
+  onClose: () => void;
+}) {
+  const completedJobs = jobs.filter((j) => j.status === "completed" && j.output_url);
+  const [idx, setIdx] = useState(() =>
+    Math.max(0, Math.min(initialIndex, completedJobs.length - 1))
+  );
+  const [autoAdvance, setAutoAdvance] = useState<number | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const current = completedJobs[idx];
+  const hasPrev = idx > 0;
+  const hasNext = idx < completedJobs.length - 1;
+
+  // Keyboard nav
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowRight" && hasNext) goNext();
+      if (e.key === "ArrowLeft" && hasPrev) goPrev();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx, hasNext, hasPrev, onClose]);
+
+  // Auto-play on scene change
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.load();
+      videoRef.current.play().catch(() => {});
+    }
+    setAutoAdvance(null);
+    if (timerRef.current) clearInterval(timerRef.current);
+  }, [idx]);
+
+  // Auto-advance on video end
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const onEnded = () => {
+      if (!hasNext) return;
+      let count = 4;
+      setAutoAdvance(count);
+      timerRef.current = setInterval(() => {
+        count -= 1;
+        if (count <= 0) {
+          clearInterval(timerRef.current!);
+          setAutoAdvance(null);
+          setIdx((i) => Math.min(i + 1, completedJobs.length - 1));
+        } else {
+          setAutoAdvance(count);
+        }
+      }, 1000);
+    };
+    video.addEventListener("ended", onEnded);
+    return () => {
+      video.removeEventListener("ended", onEnded);
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [idx, hasNext, completedJobs.length]);
+
+  const goNext = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setAutoAdvance(null);
+    setIdx((i) => Math.min(i + 1, completedJobs.length - 1));
+  }, [completedJobs.length]);
+
+  const goPrev = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setAutoAdvance(null);
+    setIdx((i) => Math.max(i - 1, 0));
+  }, []);
+
+  // Narration: prefer AI scene_summary from backend, fallback to metadata
+  const narration =
+    current?.scene_summary ||
+    current?.prompt_json?.scene_summary ||
+    [
+      current?.prompt_json?.location ? `${current.prompt_json.location}.` : "",
+      current?.prompt_json?.mood ? `Mood: ${current.prompt_json.mood}.` : "",
+    ].filter(Boolean).join(" ") ||
+    "";
+
+  if (!current) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 90,
+        background: "rgba(0,0,0,0.97)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {/* Close */}
+      <button
+        id="theater-close"
+        onClick={onClose}
+        style={{
+          position: "absolute",
+          top: 20,
+          right: 20,
+          zIndex: 10,
+          padding: 10,
+          borderRadius: 12,
+          background: "rgba(255,255,255,0.07)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          color: "rgba(255,255,255,0.6)",
+          cursor: "pointer",
+          display: "flex",
+        }}
+      >
+        <X size={18} />
+      </button>
+
+      {/* Scene counter */}
+      <div
+        style={{
+          position: "absolute",
+          top: 20,
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "6px 14px",
+          borderRadius: 20,
+          background: "rgba(255,255,255,0.06)",
+          border: "1px solid rgba(255,255,255,0.1)",
+        }}
+      >
+        <Film size={13} style={{ color: "#60A5FA" }} />
+        <span style={{ color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 700 }}>
+          Scene #{current.scene_number}
+        </span>
+        <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>
+          {idx + 1} / {completedJobs.length}
+        </span>
+      </div>
+
+      {/* Video */}
+      <div
+        style={{
+          width: "min(90vw, 1200px)",
+          maxHeight: "68vh",
+          position: "relative",
+          borderRadius: 16,
+          overflow: "hidden",
+          boxShadow: "0 0 80px rgba(0,0,0,0.8)",
+        }}
+      >
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+        <video
+          ref={videoRef}
+          src={current.output_url!}
+          controls
+          autoPlay
+          style={{ width: "100%", display: "block", objectFit: "contain" }}
+        />
+
+        {/* Auto-advance countdown */}
+        <AnimatePresence>
+          {autoAdvance !== null && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                position: "absolute",
+                bottom: 16,
+                right: 16,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "8px 14px",
+                borderRadius: 10,
+                background: "rgba(0,0,0,0.8)",
+                border: "1px solid rgba(96,165,250,0.4)",
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              <Loader2 size={13} style={{ color: "#60A5FA", animation: "spin 1s linear infinite" }} />
+              <span style={{ color: "#60A5FA", fontSize: 12, fontWeight: 700 }}>
+                Next scene in {autoAdvance}s
+              </span>
+              <button
+                onClick={() => { if (timerRef.current) clearInterval(timerRef.current); setAutoAdvance(null); }}
+                style={{
+                  padding: "2px 6px",
+                  borderRadius: 5,
+                  background: "rgba(248,113,113,0.15)",
+                  border: "1px solid rgba(248,113,113,0.3)",
+                  color: "#F87171",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Narration / scene summary */}
+      {narration && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            marginTop: 18,
+            maxWidth: "min(80vw, 780px)",
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 10,
+          }}
+        >
+          <MessageSquare size={14} style={{ color: "rgba(167,139,250,0.6)", flexShrink: 0, marginTop: 2 }} />
+          <p
+            style={{
+              color: "rgba(255,255,255,0.5)",
+              fontSize: 13,
+              lineHeight: 1.7,
+              fontStyle: "italic",
+              margin: 0,
+            }}
+          >
+            {narration}
+          </p>
+        </motion.div>
+      )}
+
+      {/* Prev / dots / Next */}
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 22 }}>
+        <button
+          id="theater-prev"
+          onClick={goPrev}
+          disabled={!hasPrev}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
+            padding: "10px 20px",
+            borderRadius: 12,
+            background: hasPrev ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.02)",
+            border: hasPrev ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(255,255,255,0.05)",
+            color: hasPrev ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.2)",
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: hasPrev ? "pointer" : "not-allowed",
+            transition: "all 0.15s",
+          }}
+        >
+          <ChevronLeft size={16} />
+          Prev
+        </button>
+
+        <div style={{ display: "flex", gap: 6 }}>
+          {completedJobs.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => { if (timerRef.current) clearInterval(timerRef.current); setAutoAdvance(null); setIdx(i); }}
+              style={{
+                width: i === idx ? 20 : 8,
+                height: 8,
+                borderRadius: 4,
+                background: i === idx ? "#60A5FA" : "rgba(255,255,255,0.2)",
+                border: "none",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                padding: 0,
+              }}
+            />
+          ))}
+        </div>
+
+        <button
+          id="theater-next"
+          onClick={goNext}
+          disabled={!hasNext}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
+            padding: "10px 20px",
+            borderRadius: 12,
+            background: hasNext ? "rgba(96,165,250,0.12)" : "rgba(255,255,255,0.02)",
+            border: hasNext ? "1px solid rgba(96,165,250,0.35)" : "1px solid rgba(255,255,255,0.05)",
+            color: hasNext ? "#60A5FA" : "rgba(255,255,255,0.2)",
+            fontSize: 13,
+            fontWeight: 700,
+            cursor: hasNext ? "pointer" : "not-allowed",
+            transition: "all 0.15s",
+          }}
+        >
+          Next
+          <ChevronRight size={16} />
+        </button>
+      </div>
+
+      <p style={{ color: "rgba(255,255,255,0.18)", fontSize: 11, marginTop: 14 }}>
+        ← → to navigate · Esc to close
+      </p>
+    </motion.div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
 /*  Main Panel                                                                  */
 /* ─────────────────────────────────────────────────────────────────────────── */
 
@@ -616,6 +950,7 @@ export function SceneVideosPanel({
   const [isTriggering, setIsTriggering] = useState(false);
   const [extraPrompt, setExtraPrompt] = useState("");
   const [hasTriggered, setHasTriggered] = useState(false);
+  const [theaterIndex, setTheaterIndex] = useState<number | null>(null);  // theater mode
 
   // Fetch current job statuses
   const fetchJobs = useCallback(async () => {
@@ -817,7 +1152,7 @@ export function SceneVideosPanel({
                     </span>
                   </div>
 
-                  {/* HF badge */}
+                  {/* Veo badge */}
                   <div
                     style={{
                       display: "flex",
@@ -830,7 +1165,7 @@ export function SceneVideosPanel({
                     }}
                   >
                     <span style={{ color: "#60A5FA", fontSize: 10, fontWeight: 700 }}>
-                      HuggingFace · damo-vilab
+                      Veo 3.1 Fast · Vertex AI
                     </span>
                   </div>
 
@@ -899,7 +1234,7 @@ export function SceneVideosPanel({
                         marginTop: 3,
                       }}
                     >
-                      Add a global style override that applies to all 5 scenes. The auto-detected
+                      Add a global style override that applies to all 4 scenes. The auto-detected
                       mood, camera, and lighting are already included.
                     </p>
                   </div>
@@ -1008,8 +1343,8 @@ export function SceneVideosPanel({
                         style={{ color: "#FDB022", animation: "spin 1s linear infinite", flexShrink: 0 }}
                       />
                       <span style={{ color: "#FDB022", fontSize: 12, fontWeight: 700 }}>
-                        {pendingCount} clip{pendingCount !== 1 ? "s" : ""} generating on HuggingFace
-                        free GPU — check back in 1–2 minutes…
+                        {pendingCount} clip{pendingCount !== 1 ? "s" : ""} generating via
+                        Veo 3.1 Fast — this can take 1–3 minutes per clip…
                       </span>
                     </motion.div>
                   )}
@@ -1072,7 +1407,9 @@ export function SceneVideosPanel({
                         style={{ color: "rgba(255,255,255,0.25)", fontSize: 12 }}
                       >
                         Click <strong style={{ color: "#60A5FA" }}>Generate</strong> above to
-                        create cinematic previews for the top 5 scenes.
+                        create cinematic AI video previews for the top 4 scenes.
+                        <br />
+                        Powered by <strong style={{ color: "#60A5FA" }}>Veo 3.1 Fast</strong> · 5-second clips · 16:9 cinematic.
                         <br />
                         Optionally add creative direction first.
                       </p>
@@ -1089,8 +1426,51 @@ export function SceneVideosPanel({
                       gap: 14,
                     }}
                   >
-                    {jobs.map((job) => (
-                      <VideoJobCard key={job.id} job={job} onRetry={handleRetry} />
+                    {jobs.map((job, gridIdx) => (
+                      <div
+                        key={job.id}
+                        style={{ position: "relative" }}
+                      >
+                        <VideoJobCard job={job} onRetry={handleRetry} />
+                        {/* Theater mode open button — only for completed clips */}
+                        {job.status === "completed" && job.output_url && (
+                          <button
+                            id={`theater-open-${job.scene_number}`}
+                            onClick={() => {
+                              const completedJobs = jobs.filter(
+                                (j) => j.status === "completed" && j.output_url
+                              );
+                              const theaterIdx = completedJobs.findIndex(
+                                (j) => j.id === job.id
+                              );
+                              setTheaterIndex(theaterIdx >= 0 ? theaterIdx : 0);
+                            }}
+                            title="Open in theater mode"
+                            style={{
+                              position: "absolute",
+                              top: 44,
+                              left: 8,
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                              padding: "3px 8px",
+                              borderRadius: 6,
+                              background: "rgba(0,0,0,0.6)",
+                              border: "1px solid rgba(255,255,255,0.15)",
+                              backdropFilter: "blur(6px)",
+                              color: "rgba(255,255,255,0.6)",
+                              cursor: "pointer",
+                              fontSize: 9,
+                              fontWeight: 700,
+                              letterSpacing: "0.04em",
+                              zIndex: 5,
+                            }}
+                          >
+                            <Maximize2 size={9} />
+                            Theater
+                          </button>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}
@@ -1109,9 +1489,10 @@ export function SceneVideosPanel({
               >
                  <Info size={12} style={{ color: "rgba(255,255,255,0.25)", flexShrink: 0 }} />
                  <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, margin: 0 }}>
-                   Video previews use Ken Burns animation (local CPU, zero cost). Voiceover uses the
-                   browser&apos;s built-in{" "}
-                   <strong>Web Speech API</strong> — completely free, no API key required.
+                   First 4 scenes use <strong>Veo 3.1 Fast</strong> (Vertex AI · 5-second clips).
+                   Already-generated videos load instantly from the database — no re-billing.
+                   Voiceover uses the browser&apos;s built-in{" "}
+                   <strong>Web Speech API</strong> — completely free.
                    Toggle the{" "}
                    <Mic size={9} style={{ display: "inline", verticalAlign: "middle", marginBottom: 1 }} />{" "}
                    button on any clip to enable cinematic narration.
@@ -1121,6 +1502,15 @@ export function SceneVideosPanel({
           </>
         )}
       </AnimatePresence>
+
+      {/* ── Theater Mode ── */}
+      {theaterIndex !== null && (
+        <VideoTheater
+          jobs={jobs}
+          initialIndex={theaterIndex}
+          onClose={() => setTheaterIndex(null)}
+        />
+      )}
     </>
   );
 }

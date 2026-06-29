@@ -20,7 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from app.api import graph, graph_explain, health, narrator, projects, query, scenes, upload, video
+from app.api import graph, graph_explain, health, narrator, projects, query, scenes, screenplay_assist, upload, video
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.security import limiter
@@ -79,6 +79,7 @@ app.include_router(graph.router, prefix="/api/v1", tags=["graph"])
 app.include_router(graph_explain.router, prefix="/api/v1", tags=["graph"])
 app.include_router(video.router, prefix="/api/v1", tags=["video"])
 app.include_router(narrator.router, prefix="/api/v1", tags=["narrator"])
+app.include_router(screenplay_assist.router, prefix="/api/v1", tags=["screenplay"])
 
 if __name__ == "__main__":
     import uvicorn

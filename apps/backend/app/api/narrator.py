@@ -246,8 +246,8 @@ def _parse_narration_json(raw: str, expected_count: int) -> Dict[int, str]:
 
 async def _batch_narrate(scenes: List[Dict[str, Any]], language: str) -> Dict[int, str]:
     prompt = _build_batch_prompt(scenes, language)
-    # ~120 tokens per 4-sentence narration + JSON overhead
-    max_tokens = min(130 * len(scenes) + 400, 8000)
+    # Malayalam/non-latin scripts use significantly more tokens. Use a high limit.
+    max_tokens = 7500
 
     logger.info(
         f"[narrator] Batch call: {len(scenes)} scenes, "
@@ -291,7 +291,7 @@ async def _narrate_one_scene(scene: Dict[str, Any], language: str) -> str:
         f"Content:\n{content}\n\n"
         "Return ONLY the 4-sentence narration, nothing else."
     )
-    text = await _call_llm(prompt, max_tokens=200)
+    text = await _call_llm(prompt, max_tokens=1000)
     return text or f"Scene {scene['scene_number']} unfolds at {scene.get('location', 'an unknown location')}."
 
 

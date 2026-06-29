@@ -61,3 +61,7 @@ htmlcov/
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Google Cloud service account credentials — NEVER commit these!
+gcp-key.json
+*-key.json

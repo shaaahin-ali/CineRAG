@@ -17,7 +17,6 @@ from app.services.ml_emotion import MalayalamEmotionDetector
 from app.services.ml_parsing import MalayalamScreenplayParser
 from app.services.retrieval import upsert_chunks
 from app.services.scene_images import generate_images_for_project
-from app.services.scene_videos import generate_videos_for_project
 from app.services.storage import SupabaseClient
 from app.utils.chunking import chunk_scenes
 from app.utils.parsing import parse_screenplay_text
@@ -194,16 +193,10 @@ async def run_ingestion_pipeline(
                 scenes=scenes,
             )
         )
-
-        # ── Step 10: Queue demo video generation for top 5 scenes (background) ──
-        await _progress("videos", "Queuing demo scene video generation")
-        asyncio.create_task(
-            generate_videos_for_project(
-                project_id=project_id,
-                scenes=scenes,
-                extra_prompt="",  # No extra prompt on auto-trigger; user can add via UI
-            )
-        )
+        # NOTE: Video generation is NOT triggered here.
+        # Videos are only generated when the user explicitly presses
+        # "Generate Videos" in the Scene Videos panel.
+        # This prevents accidental Veo API charges on every upload.
 
     except Exception as e:
         logger.error(f"[Ingestion] Failed for project {project_id}: {e}", exc_info=True)

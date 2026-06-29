@@ -42,8 +42,16 @@ class Settings(BaseSettings):
     COHERE_API_KEY: str = ""
     COHERE_RERANK_MODEL: str = "rerank-english-v3.0"
 
-    # ── Gemini ───────────────────────────────────────────────────────────────
+    # ── Gemini / Google Cloud ─────────────────────────────────────────────────
     GEMINI_API_KEY: str = ""
+    GOOGLE_CLOUD_PROJECT: str = ""
+    GOOGLE_CLOUD_REGION: str = "us-central1"
+    # Path to the downloaded service-account JSON key (gcp-key.json).
+    # Set GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/to/gcp-key.json
+    GOOGLE_APPLICATION_CREDENTIALS: str = ""
+    # Hard cap: only the first N scenes get real Veo generation.
+    # Remaining scenes fall back to the free Ken Burns animation.
+    VEO_MAX_SCENES: int = 4
 
     # ── OpenRouter ───────────────────────────────────────────────────────────
     OPENROUTER_API_KEY: str = ""
