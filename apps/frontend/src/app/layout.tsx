@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/components/AuthProvider";
 import { ReactQueryProvider } from "@/components/ReactQueryProvider";
 import { AppTopDock } from "@/components/AppTopDock";
+import { TopNavBar } from "@/components/TopNavBar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,13 +27,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CinePhile — AI Screenplay Assistant for Mollywood",
+  title: "CineRAG — AI Screenplay Assistant for Mollywood",
   description:
     "Upload a Malayalam screenplay and query it in Malayalam or English. Get streaming answers with exact scene citations for your entire film crew.",
   keywords:
     "Malayalam cinema, Mollywood, screenplay AI, RAG, film crew, script analysis",
   openGraph: {
-    title: "CinePhile — AI for Mollywood",
+    title: "CineRAG — AI for Mollywood",
     description: "AI-powered screenplay analysis for Malayalam film crews",
     type: "website",
   },
@@ -48,6 +49,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${meera.variable} ${jetbrainsMono.variable} antialiased`}>
         <AuthProvider>
           <ReactQueryProvider>
+            <TopNavBar />
             {children}
             <AppTopDock />
             <Toaster

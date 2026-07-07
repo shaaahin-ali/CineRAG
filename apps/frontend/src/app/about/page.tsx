@@ -48,7 +48,7 @@ export default function AboutPage() {
   const primaryLabel = isAuthenticated ? "Open dashboard" : "Get started";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-black text-white pt-16">
       <div
         className="pointer-events-none absolute inset-0"
         style={{

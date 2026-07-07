@@ -74,9 +74,9 @@ export function AppTopDock() {
       <LimelightNav
         items={navItems}
         tone="dark"
-        className="bg-[#05070f]/90 border-white/10"
-        iconClassName="text-zinc-400 hover:text-white"
-        limelightClassName="bg-white shadow-[0_28px_24px_rgba(255,255,255,0.14)]"
+        className="bg-black/90 border-white/8"
+        iconClassName="text-zinc-500 hover:text-white"
+        limelightClassName="bg-white shadow-[0_28px_24px_rgba(255,255,255,0.08)]"
       />
     </div>
   );

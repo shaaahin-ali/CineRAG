@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -22,6 +22,8 @@ import {
   UserCircle2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription, PLAN_DETAILS } from "@/hooks/useSubscription";
+import { PricingModal } from "@/components/PricingModal";
 import { api } from "@/lib/api-client";
 import { Footer } from "@/components/ui/footer-section";
 import type { Project } from "@/types";
@@ -84,6 +86,8 @@ export default function ProfilePage() {
   const router = useRouter();
   const { data: session } = useSession();
   const { logout } = useAuth();
+  const { plan } = useSubscription();
+  const [showPricing, setShowPricing] = useState(false);
 
   const name = session?.user?.name || "CineRAG User";
   const email = session?.user?.email || "";
@@ -121,7 +125,7 @@ export default function ProfilePage() {
     : "—";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-black text-white pt-16">
       {/* ── Ambient background gradients ─────────────────────────────── */}
       <div
         className="pointer-events-none absolute inset-0"
@@ -509,7 +513,106 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {/* ── Subscription Section ─────────────────────────────────────── */}
+      <motion.section
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="relative z-10 mx-auto max-w-6xl px-4 pb-8 sm:px-6 lg:px-8"
+      >
+        <div className="rounded-[32px] border border-white/10 bg-zinc-950 p-6 sm:p-8">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-[0.35em] text-zinc-500">
+                Subscription
+              </p>
+              <h2 className="mt-1 text-xl font-semibold tracking-tight text-white">
+                Your Plan
+              </h2>
+            </div>
+            {plan && (
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] ${
+                  plan === "pro"
+                    ? "bg-amber-500/15 text-amber-400 border border-amber-500/25"
+                    : "bg-zinc-800 text-zinc-400 border border-white/10"
+                }`}
+              >
+                {plan === "pro" ? "Pro" : "Free"}
+              </span>
+            )}
+          </div>
+
+          {!plan ? (
+            <div className="flex flex-col items-center justify-center rounded-[24px] border border-dashed border-white/10 py-14 text-center">
+              <p className="text-sm font-medium text-zinc-400 mb-2">
+                No plan selected yet
+              </p>
+              <p className="text-xs text-zinc-600 mb-5">
+                Choose a plan to unlock AI features.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowPricing(true)}
+                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:bg-zinc-200"
+              >
+                Choose a plan
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* Plan details */}
+              <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-zinc-900/50 p-4">
+                <div>
+                  <p className="text-sm font-semibold text-white">
+                    {PLAN_DETAILS[plan].name} Plan
+                  </p>
+                  <p className="text-xs text-zinc-500 mt-0.5">
+                    {plan === "pro" ? "$24 / user / month" : "Free forever"}
+                  </p>
+                </div>
+                {plan === "free" && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPricing(true)}
+                    className="rounded-full bg-amber-500 px-4 py-2 text-xs font-bold text-black transition hover:-translate-y-0.5 hover:bg-amber-400"
+                  >
+                    Upgrade to Pro
+                  </button>
+                )}
+              </div>
+
+              {/* Features unlocked */}
+              <div className="rounded-2xl border border-white/8 bg-zinc-900/50 p-4">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3">
+                  Features unlocked
+                </p>
+                <div className="space-y-2">
+                  {PLAN_DETAILS[plan].features.map((feature) => (
+                    <div key={feature} className="flex items-center gap-2">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-400">
+                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </span>
+                      <span className="text-sm text-zinc-300">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </motion.section>
+
       <Footer />
+
+      {/* Pricing Modal */}
+      <PricingModal
+        isOpen={showPricing}
+        onClose={() => setShowPricing(false)}
+        onPlanSelected={() => setShowPricing(false)}
+      />
     </main>
   );
 }

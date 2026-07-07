@@ -1,27 +1,21 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import {
-  BarChart3,
   Film,
   Layers3,
   Plus,
   Sparkles,
   X,
   Upload,
-  BookOpen,
-  Video,
-  Network,
-  Clapperboard,
-  Radio,
-  Users,
   Wand2,
-  FileUp,
-  ArrowRight,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -29,44 +23,56 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ProjectCard } from "@/components/ProjectCard";
 import { UploadWidget } from "@/components/UploadWidget";
 import { ScreenplayAssistPanel } from "@/components/ScreenplayAssistPanel";
+import { PricingModal } from "@/components/PricingModal";
+import { useSubscription } from "@/hooks/useSubscription";
 import { api } from "@/lib/api-client";
 import { projectSchema, ProjectInput } from "@/lib/validators";
 import { Project } from "@/types";
 import { Footer } from "@/components/ui/footer-section";
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/*  Animation variants                                                       */
-/* ────────────────────────────────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/*  Animation variants                                                        */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 const stagger = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.06 } },
+  show: { transition: { staggerChildren: 0.07 } },
 } as const;
 
 const staggerItem = {
-  hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" as const } },
 } as const;
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/*  Page                                                                     */
-/* ────────────────────────────────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/*  Stat card config                                                          */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-export default function DashboardPage() {
+const STAT_CONFIG = [
+  { label: "Total",      icon: Layers3,      accent: "var(--accent-blue)",   dim: "var(--accent-blue-dim)" },
+  { label: "Ready",      icon: CheckCircle2, accent: "var(--accent-green)",  dim: "var(--accent-green-dim)" },
+  { label: "Processing", icon: Loader2,      accent: "var(--accent-cyan)",   dim: "var(--accent-cyan-dim)" },
+  { label: "Errors",     icon: AlertCircle,  accent: "#F87171",              dim: "rgba(248,113,113,0.08)" },
+] as const;
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/*  Page                                                                      */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+function DashboardContent() {
   const [showCreate, setShowCreate] = useState(false);
+  const [showPricing, setShowPricing] = useState(false);
   const [uploadProjectId, setUploadProjectId] = useState<string | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [showScreenplayAssist, setShowScreenplayAssist] = useState(false);
+  const { hasPlan } = useSubscription();
   const queryClient = useQueryClient();
   const { data: session } = useSession();
   const currentUserId = (session?.user as { id?: string } | undefined)?.id;
   const searchParams = useSearchParams();
 
-  // Auto-open Screenplay Assist from bottom dock (?assist=1)
   useEffect(() => {
-    if (searchParams.get("assist") === "1") {
-      setShowScreenplayAssist(true);
-    }
+    if (searchParams.get("assist") === "1") setShowScreenplayAssist(true);
   }, [searchParams]);
 
   const { data: projects = [], isLoading } = useQuery<Project[]>({
@@ -74,12 +80,7 @@ export default function DashboardPage() {
     queryFn: () => api.get<Project[]>("/api/v1/projects"),
   });
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ProjectInput>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<ProjectInput>({
     resolver: zodResolver(projectSchema),
   });
 
@@ -92,9 +93,7 @@ export default function DashboardPage() {
       reset();
       toast.success("Project created!", { description: "Now upload your screenplay." });
     },
-    onError: (err: Error) => {
-      toast.error("Failed to create project", { description: err.message });
-    },
+    onError: (err: Error) => toast.error("Failed to create project", { description: err.message }),
   });
 
   const updateMutation = useMutation({
@@ -105,9 +104,7 @@ export default function DashboardPage() {
       setEditingProject(null);
       toast.success("Project updated successfully");
     },
-    onError: (err: Error) => {
-      toast.error("Failed to update project", { description: err.message });
-    },
+    onError: (err: Error) => toast.error("Failed to update project", { description: err.message }),
   });
 
   const deleteMutation = useMutation({
@@ -116,77 +113,93 @@ export default function DashboardPage() {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       toast.success("Project deleted successfully");
     },
-    onError: (err: Error) => {
-      toast.error("Failed to delete project", { description: err.message });
-    },
+    onError: (err: Error) => toast.error("Failed to delete project", { description: err.message }),
   });
 
   const stats = useMemo(() => {
-    const ready = projects.filter((project) => project.status === "ready").length;
-    const processing = projects.filter(
-      (project) => project.status === "uploading" || project.status === "indexing",
-    ).length;
-    const errored = projects.filter((project) => project.status === "error").length;
-
-    return {
-      total: projects.length,
-      ready,
-      processing,
-      errors: errored,
-    };
+    const ready = projects.filter((p) => p.status === "ready").length;
+    const processing = projects.filter((p) => p.status === "uploading" || p.status === "indexing").length;
+    const errored = projects.filter((p) => p.status === "error").length;
+    return { total: projects.length, ready, processing, errors: errored };
   }, [projects]);
 
-  return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* ── Ambient background ───────────────────────────────────────── */}
-      <div
-        className="pointer-events-none fixed inset-0 z-0"
-        aria-hidden="true"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 50% at 30% 0%, rgba(253,176,34,0.05), transparent 60%), radial-gradient(ellipse 50% 40% at 80% 10%, rgba(255,255,255,0.02), transparent 50%), #000000",
-        }}
-      />
+  /* â”€â”€ Shared panel styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  const panelStyle = {
+    background: "var(--bg-card)",
+    border: "1px solid var(--border-card)",
+    borderRadius: "16px",
+  };
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* ── Header ─────────────────────────────────────────────────── */}
+  const inputCls =
+    "w-full rounded-xl px-4 py-3 text-sm transition-colors focus:outline-none";
+  const inputStyle = {
+    background: "var(--bg-elevated)",
+    border: "1px solid var(--border-subtle)",
+    color: "var(--text-primary)",
+  };
+
+  return (
+    <main
+      className="relative min-h-screen overflow-hidden text-white pt-16"
+      style={{ background: "var(--bg-deep)" }}
+    >
+      {/* â”€â”€ Ambient radial glows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
+        <div style={{
+          position: "absolute", top: "-10%", left: "50%", transform: "translateX(-50%)",
+          width: "80vw", height: "50vh",
+          background: "radial-gradient(ellipse at center, rgba(79,127,255,0.1) 0%, transparent 65%)",
+          filter: "blur(1px)",
+        }} />
+        <div style={{
+          position: "absolute", bottom: "0", right: "0",
+          width: "40vw", height: "40vh",
+          background: "radial-gradient(ellipse at bottom right, rgba(56,201,232,0.05) 0%, transparent 65%)",
+        }} />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+
+        {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <motion.header
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="mb-10 flex items-end justify-between"
         >
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.35em] text-zinc-600">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.35em]" style={{ color: "var(--accent-blue)" }}>
               Dashboard
             </p>
-            <h1 className="mt-2 text-4xl font-black tracking-tighter sm:text-5xl">
+            <h1 className="mt-2 text-4xl font-black tracking-tight sm:text-5xl" style={{ color: "var(--text-primary)" }}>
               Your workspace.
             </h1>
-            <p className="mt-3 max-w-md text-sm leading-relaxed text-zinc-600">
-              Create projects, upload screenplays, and query scenes with AI — all in one cinematic space.
+            <p className="mt-3 max-w-md text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+              Create projects, upload screenplays, and query scenes with AI â€” all in one cinematic space.
             </p>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {/* Screenplay Assist */}
+          <div className="flex items-center gap-3">
             <button
               type="button"
               id="header-screenplay-assist"
               onClick={() => setShowScreenplayAssist(true)}
-              className="hidden items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 hover:shadow-lg sm:inline-flex"
+              className="hidden items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 sm:inline-flex"
               style={{
-                background: "rgba(167,139,250,0.08)",
-                border: "1px solid rgba(167,139,250,0.2)",
-                color: "#A78BFA",
+                background: "linear-gradient(135deg,rgba(139,92,246,0.15),rgba(236,72,153,0.12))",
+                border: "1px solid rgba(139,92,246,0.35)",
+                color: "#c084fc",
+                boxShadow: "0 0 20px rgba(139,92,246,0.1)",
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(167,139,250,0.14)";
-                e.currentTarget.style.borderColor = "rgba(167,139,250,0.4)";
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = "rgba(139,92,246,0.6)";
+                e.currentTarget.style.color = "#e879f9";
+                e.currentTarget.style.boxShadow = "0 0 30px rgba(139,92,246,0.2)";
               }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(167,139,250,0.08)";
-                e.currentTarget.style.borderColor = "rgba(167,139,250,0.2)";
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = "rgba(139,92,246,0.35)";
+                e.currentTarget.style.color = "#c084fc";
+                e.currentTarget.style.boxShadow = "0 0 20px rgba(139,92,246,0.1)";
               }}
             >
               <Wand2 className="h-4 w-4" />
@@ -196,8 +209,8 @@ export default function DashboardPage() {
             <button
               type="button"
               id="header-create-project"
-              onClick={() => setShowCreate(true)}
-              className="hidden items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:bg-zinc-200 hover:shadow-lg hover:shadow-white/5 sm:inline-flex"
+              onClick={() => hasPlan() ? setShowCreate(true) : setShowPricing(true)}
+              className="hidden items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold sm:inline-flex btn-primary"
             >
               <Plus className="h-4 w-4" />
               New project
@@ -205,41 +218,54 @@ export default function DashboardPage() {
           </div>
         </motion.header>
 
-        {/* ── Stats strip ────────────────────────────────────────────── */}
+        {/* â”€â”€ Stats strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <motion.section
           variants={stagger}
           initial="hidden"
           animate="show"
           className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-4"
         >
-          {[
-            { label: "Total", value: stats.total, icon: Layers3 },
-            { label: "Ready", value: stats.ready, icon: Film },
-            { label: "Processing", value: stats.processing, icon: BarChart3 },
-            { label: "Errors", value: stats.errors, icon: X },
-          ].map((item) => {
-            const Icon = item.icon;
+          {STAT_CONFIG.map((cfg, idx) => {
+            const Icon = cfg.icon;
+            const value = [stats.total, stats.ready, stats.processing, stats.errors][idx];
             return (
               <motion.div
-                key={item.label}
+                key={cfg.label}
                 variants={staggerItem}
-                className="group rounded-[20px] border border-white/[0.06] bg-white/[0.02] p-4 transition-all duration-300 hover:border-white/[0.1] hover:bg-white/[0.04]"
+                className="group rounded-2xl p-4 transition-all duration-300"
+                style={{
+                  background: "var(--bg-card)",
+                  border: "1px solid var(--border-card)",
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = cfg.accent;
+                  (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 32px ${cfg.dim}`;
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "var(--border-card)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                }}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-zinc-600">
-                    {item.label}
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--text-muted)" }}>
+                    {cfg.label}
                   </span>
-                  <Icon className="h-3.5 w-3.5 text-zinc-700 transition-colors group-hover:text-zinc-400" />
+                  <div
+                    className="flex h-7 w-7 items-center justify-center rounded-lg"
+                    style={{ background: cfg.dim }}
+                  >
+                    <Icon className="h-3.5 w-3.5" style={{ color: cfg.accent }} />
+                  </div>
                 </div>
-                <div className="mt-2 text-2xl font-black tracking-tight text-white sm:text-3xl">
-                  {item.value}
+                <div className="text-3xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
+                  {value}
                 </div>
               </motion.div>
             );
           })}
         </motion.section>
 
-        {/* ── Panels: Create / Upload / Edit (conditionally rendered) ── */}
+        {/* â”€â”€ Panels: Create / Upload / Edit â”€â”€ */}
         <AnimatePresence>
           {showCreate && (
             <motion.section
@@ -250,45 +276,48 @@ export default function DashboardPage() {
               transition={{ duration: 0.3 }}
               className="mb-8 overflow-hidden"
             >
-              <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.02] p-6">
+              <div className="p-6" style={panelStyle}>
                 <div className="mb-5 flex items-center justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold text-white">New project</h2>
-                    <p className="mt-0.5 text-xs text-zinc-600">
+                    <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>New project</h2>
+                    <p className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
                       Add your screenplay title and optional description.
                     </p>
                   </div>
                   <button
                     onClick={() => setShowCreate(false)}
-                    className="rounded-full p-2 text-zinc-600 transition hover:bg-white/5 hover:text-white"
+                    className="rounded-lg p-2 transition"
+                    style={{ color: "var(--text-muted)" }}
+                    onMouseEnter={e => (e.currentTarget.style.color = "var(--text-primary)")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
                 <form onSubmit={handleSubmit((data) => createMutation.mutate(data))} className="grid gap-4">
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+                    <label className="mb-1.5 block text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
                       Screenplay title
                     </label>
                     <input
                       {...register("title")}
                       id="project-title-input"
                       placeholder="e.g. Kumbalangi Nights"
-                      className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-zinc-700 transition-colors focus:border-amber-500/30 focus:outline-none focus:ring-1 focus:ring-amber-500/10"
+                      className={inputCls}
+                      style={inputStyle}
                     />
-                    {errors.title && (
-                      <p className="mt-1 text-xs text-red-400">{errors.title.message}</p>
-                    )}
+                    {errors.title && <p className="mt-1 text-xs" style={{ color: "#F87171" }}>{errors.title.message}</p>}
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+                    <label className="mb-1.5 block text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
                       Description
                     </label>
                     <input
                       {...register("description")}
                       id="project-description-input"
                       placeholder="Brief description (optional)"
-                      className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-zinc-700 transition-colors focus:border-amber-500/30 focus:outline-none focus:ring-1 focus:ring-amber-500/10"
+                      className={inputCls}
+                      style={inputStyle}
                     />
                   </div>
                   <div className="flex flex-col gap-3 pt-1 sm:flex-row">
@@ -296,14 +325,14 @@ export default function DashboardPage() {
                       type="submit"
                       id="create-project-submit"
                       disabled={createMutation.isPending}
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:bg-zinc-200 disabled:opacity-50"
+                      className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                      {createMutation.isPending ? "Creating…" : "Create project"}
+                      {createMutation.isPending ? "Creatingâ€¦" : "Create project"}
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowCreate(false)}
-                      className="inline-flex items-center justify-center rounded-full border border-white/[0.08] px-5 py-3 text-sm font-medium text-zinc-400 transition hover:border-white/15 hover:text-white"
+                      className="btn-ghost inline-flex items-center justify-center"
                     >
                       Cancel
                     </button>
@@ -322,29 +351,30 @@ export default function DashboardPage() {
               transition={{ duration: 0.3 }}
               className="mb-8 overflow-hidden"
             >
-              <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.02] p-6">
+              <div className="p-6" style={panelStyle}>
                 <div className="mb-5 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10">
-                      <Upload className="h-4 w-4 text-amber-400" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl icon-box">
+                      <Upload className="h-4 w-4" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-white">Upload screenplay</h2>
-                      <p className="text-xs text-zinc-600">Your new project is ready for a file.</p>
+                      <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>Upload screenplay</h2>
+                      <p className="text-xs" style={{ color: "var(--text-muted)" }}>Your new project is ready for a file.</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setUploadProjectId(null)}
-                    className="rounded-full p-2 text-zinc-600 transition hover:bg-white/5 hover:text-white"
+                    className="rounded-lg p-2 transition"
+                    style={{ color: "var(--text-muted)" }}
+                    onMouseEnter={e => (e.currentTarget.style.color = "var(--text-primary)")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
                 <UploadWidget
                   projectId={uploadProjectId}
-                  onUploadComplete={() => {
-                    queryClient.invalidateQueries({ queryKey: ["projects"] });
-                  }}
+                  onUploadComplete={() => queryClient.invalidateQueries({ queryKey: ["projects"] })}
                 />
               </div>
             </motion.section>
@@ -359,15 +389,18 @@ export default function DashboardPage() {
               transition={{ duration: 0.3 }}
               className="mb-8 overflow-hidden"
             >
-              <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.02] p-6">
+              <div className="p-6" style={panelStyle}>
                 <div className="mb-5 flex items-center justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold text-white">Edit project</h2>
-                    <p className="mt-0.5 text-xs text-zinc-600">Update your screenplay details.</p>
+                    <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>Edit project</h2>
+                    <p className="mt-0.5 text-xs" style={{ color: "var(--text-muted)" }}>Update your screenplay details.</p>
                   </div>
                   <button
                     onClick={() => setEditingProject(null)}
-                    className="rounded-full p-2 text-zinc-600 transition hover:bg-white/5 hover:text-white"
+                    className="rounded-lg p-2 transition"
+                    style={{ color: "var(--text-muted)" }}
+                    onMouseEnter={e => (e.currentTarget.style.color = "var(--text-primary)")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -375,17 +408,15 @@ export default function DashboardPage() {
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    const formData = new FormData(e.currentTarget);
-                    const title = formData.get("title") as string;
-                    const description = formData.get("description") as string;
-                    if (title) {
-                      updateMutation.mutate({ id: editingProject.id, input: { title, description } });
-                    }
+                    const fd = new FormData(e.currentTarget);
+                    const title = fd.get("title") as string;
+                    const description = fd.get("description") as string;
+                    if (title) updateMutation.mutate({ id: editingProject.id, input: { title, description } });
                   }}
                   className="grid gap-4"
                 >
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+                    <label className="mb-1.5 block text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
                       Screenplay title
                     </label>
                     <input
@@ -393,32 +424,34 @@ export default function DashboardPage() {
                       defaultValue={editingProject.title}
                       required
                       placeholder="e.g. Kumbalangi Nights"
-                      className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-zinc-700 transition-colors focus:border-amber-500/30 focus:outline-none focus:ring-1 focus:ring-amber-500/10"
+                      className={inputCls}
+                      style={inputStyle}
                     />
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+                    <label className="mb-1.5 block text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
                       Description
                     </label>
                     <input
                       name="description"
                       defaultValue={editingProject.description || ""}
                       placeholder="Brief description"
-                      className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-zinc-700 transition-colors focus:border-amber-500/30 focus:outline-none focus:ring-1 focus:ring-amber-500/10"
+                      className={inputCls}
+                      style={inputStyle}
                     />
                   </div>
                   <div className="flex flex-col gap-3 pt-1 sm:flex-row">
                     <button
                       type="submit"
                       disabled={updateMutation.isPending}
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:bg-zinc-200 disabled:opacity-50"
+                      className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                      {updateMutation.isPending ? "Saving…" : "Save changes"}
+                      {updateMutation.isPending ? "Savingâ€¦" : "Save changes"}
                     </button>
                     <button
                       type="button"
                       onClick={() => setEditingProject(null)}
-                      className="inline-flex items-center justify-center rounded-full border border-white/[0.08] px-5 py-3 text-sm font-medium text-zinc-400 transition hover:border-white/15 hover:text-white"
+                      className="btn-ghost inline-flex items-center justify-center"
                     >
                       Cancel
                     </button>
@@ -429,20 +462,20 @@ export default function DashboardPage() {
           )}
         </AnimatePresence>
 
-        {/* ── Projects grid ───────────────────────────────────────────── */}
+        {/* â”€â”€ Projects grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <section className="pb-20">
-          <div className="mb-5 flex items-end justify-between gap-4">
+          <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-xl font-bold tracking-tight text-white">
+              <h2 className="text-xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
                 Projects
               </h2>
-              <p className="mt-1 text-xs text-zinc-600">
+              <p className="mt-1 text-xs" style={{ color: "var(--text-muted)" }}>
                 {currentUserId
                   ? (() => {
                       const owned = projects.filter(p => p.owner_id === currentUserId).length;
                       const shared = projects.length - owned;
-                      if (owned === 0 && shared === 0) return "No projects yet — create one to get started.";
-                      if (owned > 0 && shared > 0) return `${owned} owned · ${shared} shared with you`;
+                      if (owned === 0 && shared === 0) return "No projects yet â€” create one to get started.";
+                      if (owned > 0 && shared > 0) return `${owned} owned Â· ${shared} shared with you`;
                       if (shared > 0) return `${shared} project${shared === 1 ? "" : "s"} shared with you`;
                       return "Open a ready project to begin querying.";
                     })()
@@ -453,8 +486,8 @@ export default function DashboardPage() {
             {/* Mobile create button */}
             <button
               type="button"
-              onClick={() => setShowCreate(true)}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:bg-zinc-200 sm:hidden"
+              onClick={() => hasPlan() ? setShowCreate(true) : setShowPricing(true)}
+              className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold btn-primary sm:hidden"
             >
               <Plus className="h-4 w-4" />
               Create
@@ -462,35 +495,36 @@ export default function DashboardPage() {
           </div>
 
           {isLoading ? (
-            /* Skeleton grid */
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="h-44 animate-pulse rounded-[24px] border border-white/[0.04] bg-white/[0.02]"
-                />
+                <div key={i} className="h-44 rounded-2xl skeleton" style={{ border: "1px solid var(--border-subtle)" }} />
               ))}
             </div>
           ) : projects.length === 0 ? (
-            /* ── Empty state — two clean paths ── */
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-white/[0.08] py-20 text-center"
+              className="flex flex-col items-center justify-center rounded-2xl py-20 text-center"
+              style={{ border: "1px dashed var(--border-subtle)" }}
             >
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.02]">
-                <Film className="h-7 w-7 text-zinc-600" />
+              <div
+                className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl"
+                style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-card)" }}
+              >
+                <Film className="h-7 w-7" style={{ color: "var(--text-muted)" }} />
               </div>
-              <h3 className="mt-6 text-xl font-semibold text-white">No projects yet</h3>
-              <p className="mx-auto mt-2 max-w-sm text-sm text-zinc-600">
-                Upload a screenplay to unlock AI scene analysis, character graphs, and video previews — or write one from scratch.
+              <h3 className="mt-6 text-xl font-semibold" style={{ color: "var(--text-primary)" }}>
+                No projects yet
+              </h3>
+              <p className="mx-auto mt-2 max-w-sm text-sm" style={{ color: "var(--text-secondary)" }}>
+                Upload a screenplay to unlock AI scene analysis, character graphs, and video previews â€” or write one from scratch.
               </p>
 
               <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
                 <button
                   id="empty-create-project"
-                  onClick={() => setShowCreate(true)}
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:bg-zinc-200"
+                  onClick={() => hasPlan() ? setShowCreate(true) : setShowPricing(true)}
+                  className="btn-primary inline-flex items-center gap-2"
                 >
                   <Sparkles className="h-4 w-4" />
                   Upload screenplay
@@ -498,12 +532,7 @@ export default function DashboardPage() {
                 <button
                   id="empty-screenplay-assist"
                   onClick={() => setShowScreenplayAssist(true)}
-                  className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5"
-                  style={{
-                    background: "rgba(167,139,250,0.08)",
-                    border: "1px solid rgba(167,139,250,0.2)",
-                    color: "#A78BFA",
-                  }}
+                  className="btn-ghost inline-flex items-center gap-2"
                 >
                   <Wand2 className="h-4 w-4" />
                   Write with AI
@@ -511,8 +540,49 @@ export default function DashboardPage() {
               </div>
             </motion.div>
           ) : (
-            /* Project cards */
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {/* Screenplay Assist card — always first */}
+              <motion.button
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.38, ease: "easeOut" }}
+                onClick={() => setShowScreenplayAssist(true)}
+                id="screenplay-assist-card"
+                className="flex flex-col items-start gap-3 rounded-2xl p-5 text-left transition-all group cursor-pointer"
+                style={{
+                  background: "linear-gradient(135deg,rgba(139,92,246,0.08),rgba(236,72,153,0.06))",
+                  border: "1px dashed rgba(139,92,246,0.3)",
+                  minHeight: 160,
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(139,92,246,0.55)";
+                  (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg,rgba(139,92,246,0.14),rgba(236,72,153,0.1))";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 30px rgba(139,92,246,0.12)";
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(139,92,246,0.3)";
+                  (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg,rgba(139,92,246,0.08),rgba(236,72,153,0.06))";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                }}
+              >
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl transition-all"
+                  style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.25)" }}
+                >
+                  <Wand2 className="h-5 w-5" style={{ color: "#c084fc" }} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold" style={{ color: "#c084fc" }}>Write Screenplay</p>
+                  <p className="text-xs mt-1" style={{ color: "rgba(192,132,252,0.5)" }}>
+                    AI-powered screenplay from your idea
+                  </p>
+                </div>
+                <div className="mt-auto flex items-center gap-1.5 text-xs" style={{ color: "rgba(139,92,246,0.6)" }}>
+                  <Sparkles className="h-3 w-3" />
+                  Generate screenplay
+                </div>
+              </motion.button>
+
               {projects.map((project, index) => {
                 const isOwner = !currentUserId || project.owner_id === currentUserId;
                 return (
@@ -534,13 +604,29 @@ export default function DashboardPage() {
           )}
         </section>
       </div>
+
       <Footer />
 
-      {/* ── Screenplay Assist Panel ── */}
+      {/* â”€â”€ Screenplay Assist Panel â”€â”€ */}
       <ScreenplayAssistPanel
         isOpen={showScreenplayAssist}
         onClose={() => setShowScreenplayAssist(false)}
       />
+
+      {/* â”€â”€ Pricing Modal â”€â”€ */}
+      <PricingModal
+        isOpen={showPricing}
+        onClose={() => setShowPricing(false)}
+        onPlanSelected={() => { setShowPricing(false); setShowCreate(true); }}
+      />
     </main>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
   );
 }

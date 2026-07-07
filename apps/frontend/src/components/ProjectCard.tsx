@@ -9,7 +9,7 @@ import {
   Users,
   AlertCircle,
   Loader2,
-  CheckCircle,
+  Check,
   Edit2,
   Trash2,
   Share2,
@@ -28,27 +28,27 @@ interface ProjectCardProps {
 const statusConfig = {
   ready: {
     label: "Ready",
-    icon: <CheckCircle className="w-3 h-3" />,
-    dot: "bg-emerald-500 shadow-[0_0_6px_rgba(52,211,153,0.6)]",
-    pill: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+    icon: <Check className="w-3 h-3" />,
+    badge: "text-zinc-300 bg-white/[0.04] border border-white/[0.1]",
+    barColor: "bg-white/20",
   },
   indexing: {
     label: "Indexing",
     icon: <Loader2 className="w-3 h-3 animate-spin" />,
-    dot: "bg-amber-500 shadow-[0_0_6px_rgba(253,176,34,0.6)]",
-    pill: "text-amber-400 bg-amber-500/10 border-amber-500/20",
+    badge: "text-zinc-400 bg-white/[0.03] border border-white/[0.08]",
+    barColor: "bg-white/15",
   },
   uploading: {
     label: "Uploading",
     icon: <Loader2 className="w-3 h-3 animate-spin" />,
-    dot: "bg-blue-400 shadow-[0_0_6px_rgba(96,165,250,0.6)]",
-    pill: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+    badge: "text-zinc-400 bg-white/[0.03] border border-white/[0.08]",
+    barColor: "bg-white/15",
   },
   error: {
     label: "Error",
     icon: <AlertCircle className="w-3 h-3" />,
-    dot: "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.6)]",
-    pill: "text-red-400 bg-red-500/10 border-red-500/20",
+    badge: "text-red-400/80 bg-red-500/[0.05] border border-red-500/[0.12]",
+    barColor: "bg-red-400/20",
   },
 };
 
@@ -79,7 +79,7 @@ export function ProjectCard({
     >
       <Link
         href={isReady ? `/query/${project.id}` : "#"}
-        className="group relative block rounded-[24px] border border-white/[0.06] bg-white/[0.02] p-5 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04]"
+        className="group relative block rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04]"
         onClick={!isReady ? (e) => e.preventDefault() : undefined}
         id={`project-card-${project.id}`}
       >
@@ -87,8 +87,8 @@ export function ProjectCard({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2.5">
-              <Film className="h-4 w-4 shrink-0 text-amber-500/50 transition-colors group-hover:text-amber-400" />
-              <h3 className="truncate text-[15px] font-semibold text-white transition-colors group-hover:text-amber-50">
+              <Film className="h-4 w-4 shrink-0 text-zinc-600 transition-colors group-hover:text-white" />
+              <h3 className="truncate text-[15px] font-semibold text-white transition-colors group-hover:text-zinc-100">
                 {project.title}
               </h3>
             </div>
@@ -130,10 +130,11 @@ export function ProjectCard({
               </div>
             )}
 
+            {/* Premium box-style status badge */}
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${status.pill}`}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${status.badge}`}
             >
-              <span className={`inline-block h-1.5 w-1.5 rounded-full ${status.dot}`} />
+              {status.icon}
               {status.label}
             </span>
           </div>
@@ -141,7 +142,7 @@ export function ProjectCard({
 
         {/* Shared-with-you badge */}
         {!isOwner && (
-          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-violet-500/15 bg-violet-500/5 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.1em] text-violet-400">
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.1em] text-zinc-500">
             <Share2 className="w-3 h-3" />
             Shared with you
           </div>
@@ -169,7 +170,7 @@ export function ProjectCard({
           <div className="mt-4 pl-[26px]">
             <div className="h-[3px] overflow-hidden rounded-full bg-white/[0.04]">
               <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-600"
+                className="h-full rounded-full bg-gradient-to-r from-white/20 to-white/40"
                 animate={{ width: ["15%", "75%", "15%"] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -189,7 +190,7 @@ export function ProjectCard({
             {formatDate(project.created_at)}
           </span>
           {isReady && (
-            <span className="flex items-center gap-1 text-[11px] font-medium text-zinc-500 transition-colors group-hover:text-amber-400">
+            <span className="flex items-center gap-1 text-[11px] font-medium text-zinc-500 transition-colors group-hover:text-white">
               Query
               <ArrowUpRight className="h-3 w-3" />
             </span>

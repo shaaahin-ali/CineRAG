@@ -60,7 +60,7 @@ const cards = testimonials.map((t) => (
 
 export default function TestimonialsPage() {
   return (
-    <main className="relative min-h-screen bg-black text-white overflow-hidden">
+    <main className="relative min-h-screen bg-black text-white overflow-hidden pt-16">
       {/* Background gradient */}
       <div
         className="pointer-events-none absolute inset-0"

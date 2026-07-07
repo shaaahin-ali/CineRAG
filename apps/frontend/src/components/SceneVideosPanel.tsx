@@ -1426,7 +1426,7 @@ export function SceneVideosPanel({
                       gap: 14,
                     }}
                   >
-                    {jobs.map((job, gridIdx) => (
+                    {jobs.map((job) => (
                       <div
                         key={job.id}
                         style={{ position: "relative" }}

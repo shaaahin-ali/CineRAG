@@ -1,6 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
+import {
+  Clapperboard,
+  Drama,
+  Camera,
+  Music,
+  Scissors,
+  Briefcase,
+} from "lucide-react";
 import { CrewRole } from "@/types";
 
 interface RoleSelectorProps {
@@ -11,59 +19,52 @@ interface RoleSelectorProps {
 
 const ROLES: {
   value: CrewRole;
-  emoji: string;
+  icon: React.ComponentType<{ className?: string }>;
   en: string;
   ml: string;
   desc: string;
-  color: string;
 }[] = [
   {
     value: "director",
-    emoji: "🎬",
+    icon: Clapperboard,
     en: "Director",
     ml: "സംവിധായകൻ",
     desc: "Narrative structure, pacing",
-    color: "#FDB022",
   },
   {
     value: "actor",
-    emoji: "🎭",
+    icon: Drama,
     en: "Actor",
     ml: "നടൻ",
     desc: "Character arcs, emotions",
-    color: "#F43F5E",
   },
   {
     value: "cinematographer",
-    emoji: "📽️",
+    icon: Camera,
     en: "Cinematographer",
     ml: "ഛായാഗ്രാഹകൻ",
     desc: "INT/EXT, lighting, locations",
-    color: "#60A5FA",
   },
   {
     value: "music",
-    emoji: "🎵",
+    icon: Music,
     en: "Music",
     ml: "സംഗീതം",
     desc: "Emotional peaks, scenes",
-    color: "#8B5CF6",
   },
   {
     value: "editor",
-    emoji: "✂️",
+    icon: Scissors,
     en: "Editor",
     ml: "എഡിറ്റർ",
     desc: "Scene flow, transitions",
-    color: "#10B981",
   },
   {
     value: "producer",
-    emoji: "📋",
+    icon: Briefcase,
     en: "Producer",
     ml: "നിർമ്മാതാവ്",
     desc: "Locations, cast, budget",
-    color: "#F59E0B",
   },
 ];
 
@@ -76,6 +77,7 @@ export function RoleSelector({
     <div id="role-selector" className="grid grid-cols-2 gap-2">
       {ROLES.map((role) => {
         const isSelected = value === role.value;
+        const Icon = role.icon;
         return (
           <motion.button
             key={role.value}
@@ -86,10 +88,10 @@ export function RoleSelector({
             className="relative flex items-center gap-2.5 rounded-xl p-3 text-left transition-all"
             style={{
               background: isSelected
-                ? `${role.color}12`
+                ? "rgba(255,255,255,0.08)"
                 : "rgba(255,255,255,0.02)",
               border: `1px solid ${
-                isSelected ? `${role.color}35` : "rgba(255,255,255,0.06)"
+                isSelected ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.06)"
               }`,
             }}
           >
@@ -99,26 +101,28 @@ export function RoleSelector({
                 layoutId="role-active-bg"
                 className="absolute inset-0 rounded-xl"
                 style={{
-                  background: `${role.color}08`,
-                  border: `1px solid ${role.color}30`,
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.15)",
                 }}
                 transition={{ duration: 0.2 }}
               />
             )}
 
-            <span className="relative text-xl">{role.emoji}</span>
+            <span className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04]">
+              <Icon className={`h-4 w-4 ${isSelected ? "text-white" : "text-zinc-500"}`} />
+            </span>
             <div className="relative min-w-0">
               <p
                 className={`text-sm font-semibold leading-tight ${
                   language === "ml" ? "font-malayalam" : ""
                 }`}
                 style={{
-                  color: isSelected ? role.color : "#ffffff",
+                  color: isSelected ? "#ffffff" : "#a1a1aa",
                 }}
               >
                 {language === "ml" ? role.ml : role.en}
               </p>
-              <p className="mt-0.5 truncate text-xs text-zinc-500">
+              <p className="mt-0.5 truncate text-xs text-zinc-600">
                 {role.desc}
               </p>
             </div>

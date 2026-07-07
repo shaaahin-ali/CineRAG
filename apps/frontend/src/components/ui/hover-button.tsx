@@ -29,7 +29,7 @@ export function HoverButton({ children, className, ...props }: HoverButtonProps)
         "group relative inline-flex items-center justify-center overflow-hidden rounded-full",
         "px-10 py-4 text-sm font-semibold uppercase tracking-[0.2em]",
         "bg-white text-black transition-all duration-500 ease-out",
-        "hover:shadow-[0_0_40px_rgba(253,176,34,0.4),0_0_80px_rgba(253,176,34,0.15)]",
+        "hover:shadow-[0_0_40px_rgba(255,255,255,0.2),0_0_80px_rgba(255,255,255,0.06)]",
         "hover:scale-[1.03] active:scale-[0.98]",
         className
       )}
@@ -39,7 +39,7 @@ export function HoverButton({ children, className, ...props }: HoverButtonProps)
       <span
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{
-          background: `radial-gradient(circle at ${coords.x}% ${coords.y}%, rgba(253,176,34,0.35) 0%, transparent 60%)`,
+          background: `radial-gradient(circle at ${coords.x}% ${coords.y}%, rgba(255,255,255,0.25) 0%, transparent 60%)`,
         }}
       />
       {/* Shimmer sweep on hover */}
