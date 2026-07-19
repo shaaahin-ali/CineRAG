@@ -10,42 +10,42 @@ const testimonials: iTestimonial[] = [
     name: "Arun Krishnan",
     designation: "Director — Mollywood",
     description:
-      "CineRAG has completely transformed how I reference scenes during pre-production. I can query the entire screenplay in seconds and get the exact scene with context. It's like having the script in my head.",
+      "CineACUMEN has completely transformed how I reference scenes during pre-production. I can query the entire screenplay in seconds and get the exact scene with context. It's like having the script in my head.",
     profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80",
   },
   {
     name: "Meena Pillai",
     designation: "Cinematographer",
     description:
-      "As a DOP, I need to quickly understand the mood and lighting cues from the script. CineRAG finds every scene referencing visual tone in moments. Absolutely indispensable on set.",
+      "As a DOP, I need to quickly understand the mood and lighting cues from the script. CineACUMEN finds every scene referencing visual tone in moments. Absolutely indispensable on set.",
     profileImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&q=80",
   },
   {
     name: "Rahul Menon",
     designation: "Music Composer",
     description:
-      "I use CineRAG to find emotional arcs across the screenplay. Querying by emotion type gives me exactly the scenes I need to score. The Malayalam support is flawless.",
+      "I use CineACUMEN to find emotional arcs across the screenplay. Querying by emotion type gives me exactly the scenes I need to score. The Malayalam support is flawless.",
     profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&q=80",
   },
   {
     name: "Divya Nair",
     designation: "Screenwriter",
     description:
-      "When reviewing drafts, I can compare scene intentions against the actual dialogue. CineRAG is the only AI tool that truly understands Mollywood storytelling conventions.",
+      "When reviewing drafts, I can compare scene intentions against the actual dialogue. CineACUMEN is the only AI tool that truly understands Mollywood storytelling conventions.",
     profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&q=80",
   },
   {
     name: "Santhosh George",
     designation: "Production Designer",
     description:
-      "Finding all scenes with specific location or prop requirements used to take hours. Now it takes seconds. CineRAG has made our production design workflow 10x faster.",
+      "Finding all scenes with specific location or prop requirements used to take hours. Now it takes seconds. CineACUMEN has made our production design workflow 10x faster.",
     profileImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&q=80",
   },
   {
     name: "Lakshmi Varma",
     designation: "Assistant Director",
     description:
-      "Managing shot lists from the screenplay is effortless with CineRAG. I query in Malayalam and get precise answers. No other tool has come close to this level of accuracy.",
+      "Managing shot lists from the screenplay is effortless with CineACUMEN. I query in Malayalam and get precise answers. No other tool has come close to this level of accuracy.",
     profileImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&q=80",
   },
 ];
@@ -87,7 +87,7 @@ export default function TestimonialsPage() {
             <span className="text-amber-400">film crews</span>
           </h1>
           <p className="text-zinc-500 max-w-xl mx-auto text-base md:text-lg leading-relaxed">
-            Directors, cinematographers, composers, and writers across Kerala use CineRAG to
+            Directors, cinematographers, composers, and writers across Kerala use CineACUMEN to
             unlock deeper insights from their screenplays.
           </p>
         </motion.div>

@@ -11,6 +11,7 @@ export type CrewRole =
   | "cinematographer"
   | "editor"
   | "music"
+  | "narrator"
   | "viewer";
 
 export interface Project {
@@ -23,6 +24,7 @@ export interface Project {
   page_count?: number;
   scene_count?: number;
   character_count?: number;
+  hero_image_url?: string;
   created_at: string;
   updated_at: string;
 }

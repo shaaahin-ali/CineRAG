@@ -100,8 +100,24 @@ async def list_projects(request: Request) -> List[ProjectOut]:
             shared_data = shared.data or []
 
     all_projects = owned_data + shared_data
-    return [ProjectOut(**p) for p in all_projects]
 
+    # 4. Attach hero_image_url to avoid frontend waterfall delay
+    if all_projects:
+        project_ids = [p["id"] for p in all_projects]
+        images_res = db.table("scene_images").select("project_id, image_url").in_(
+            "project_id", project_ids
+        ).order("scene_number").execute()
+        
+        hero_images = {}
+        for row in (images_res.data or []):
+            pid = row["project_id"]
+            if pid not in hero_images:
+                hero_images[pid] = row["image_url"]
+                
+        for p in all_projects:
+            p["hero_image_url"] = hero_images.get(p["id"])
+
+    return [ProjectOut(**p) for p in all_projects]
 
 @router.get("/projects/{project_id}", response_model=ProjectOut)
 async def get_project(request: Request, project_id: UUID) -> ProjectOut:

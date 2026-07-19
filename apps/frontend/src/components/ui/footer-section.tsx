@@ -63,13 +63,13 @@ export function Footer() {
         <AnimatedContainer className="space-y-4">
           <div className="flex items-center gap-2">
             <Film className="h-6 w-6 text-amber-400" />
-            <span className="text-lg font-bold tracking-tight text-white">CineRAG</span>
+            <span className="text-lg font-bold tracking-tight text-white">CineACUMEN</span>
           </div>
           <p className="text-sm text-zinc-500 leading-relaxed max-w-xs">
             AI-powered screenplay analysis for Mollywood film crews. Query in Malayalam or English.
           </p>
           <p className="text-xs text-zinc-600">
-            © {new Date().getFullYear()} CineRAG. All rights reserved.
+            © {new Date().getFullYear()} CineACUMEN. All rights reserved.
           </p>
         </AnimatedContainer>
 

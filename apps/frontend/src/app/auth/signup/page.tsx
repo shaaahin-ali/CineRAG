@@ -84,7 +84,7 @@ function SignupPageContent() {
             className="mb-8 flex items-center gap-2"
           >
             <Film className="h-5 w-5 text-amber-400" />
-            <span className="text-sm font-semibold tracking-tight text-white">CineRAG</span>
+            <span className="text-sm font-semibold tracking-tight text-white">CineACUMEN</span>
           </motion.div>
 
           {/* Heading */}
@@ -94,7 +94,7 @@ function SignupPageContent() {
             transition={{ duration: 0.5, delay: 0.05 }}
           >
             <h1 className="text-4xl font-black tracking-tighter sm:text-5xl">
-              Join CineRAG.
+              Join CineACUMEN.
             </h1>
             <p className="mt-3 text-sm leading-relaxed text-zinc-500">
               Create your account and start analyzing screenplays with AI.

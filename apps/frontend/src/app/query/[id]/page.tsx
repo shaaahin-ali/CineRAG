@@ -13,6 +13,7 @@ import {
   Network,
   BookMarked,
   PlaySquare,
+  Mic2,
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,6 +25,7 @@ import { QueryHistory } from "@/components/QueryHistory";
 import { CharacterGraphPanel } from "@/components/CharacterGraphPanel";
 import { SceneStoryboardPanel } from "@/components/SceneStoryboardPanel";
 import { SceneVideosPanel } from "@/components/SceneVideosPanel";
+import { CinematicNarratorPanel } from "@/components/CinematicNarratorPanel";
 import { api } from "@/lib/api-client";
 import { Project } from "@/types";
 
@@ -46,6 +48,7 @@ export default function QueryPage({ params }: QueryPageProps) {
   const [showGraph, setShowGraph] = useState(false);
   const [showStoryboard, setShowStoryboard] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
+  const [showNarrator, setShowNarrator] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<string>("viewer");
 
@@ -59,6 +62,8 @@ export default function QueryPage({ params }: QueryPageProps) {
     ? { label: "Story Beats", close: () => setShowStoryboard(false) }
     : showVideo
     ? { label: "Scene Clips", close: () => setShowVideo(false) }
+    : showNarrator
+    ? { label: "Narrator", close: () => setShowNarrator(false) }
     : null;
 
   const { data: project, isLoading } = useQuery<Project>({
@@ -87,54 +92,63 @@ export default function QueryPage({ params }: QueryPageProps) {
 
   return (
     <main
-      className="min-h-screen flex flex-col"
-      style={{ background: "#05070f" }}
+      className="h-screen flex flex-col overflow-hidden"
+      style={{ background: "#000000" }}
     >
       {/* ── Nav ──────────────────────────────────────────────────────────────── */}
       <nav
         className="border-b px-4 py-3 flex items-center justify-between flex-shrink-0"
         style={{
-          borderColor: "rgba(30,40,80,0.7)",
-          background: "rgba(5,7,15,0.95)",
+          borderColor: "rgba(255,255,255,0.7)",
+          background: "rgba(0,0,0,0.95)",
           backdropFilter: "blur(20px)",
         }}
       >
         <div className="flex items-center gap-3">
-          {activePanel ? (
-            <button
-              type="button"
-              id="close-active-panel"
-              onClick={activePanel.close}
-              className="flex items-center gap-1.5 text-sm transition-colors rounded-lg px-2 py-1.5"
-              style={{ color: "rgba(160,180,255,0.5)" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = "white";
-                e.currentTarget.style.background = "rgba(255,255,255,0.06)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = "rgba(160,180,255,0.5)";
-                e.currentTarget.style.background = "transparent";
-              }}
-            >
-              <X className="w-4 h-4" />
-              <span className="hidden sm:inline text-xs">Close {activePanel.label}</span>
-            </button>
-          ) : (
-            <Link
-              href="/dashboard"
-              id="back-to-dashboard"
-              className="flex items-center gap-1.5 text-sm transition-colors"
-              style={{ color: "rgba(160,180,255,0.5)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "white")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(160,180,255,0.5)")}
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Dashboard</span>
-            </Link>
+          {/* Always-visible back to dashboard */}
+          <Link
+            href="/dashboard"
+            id="back-to-dashboard"
+            className="flex items-center gap-1.5 text-sm transition-colors rounded-lg px-2 py-1.5"
+            style={{ color: "rgba(255,255,255,0.5)" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "white";
+              e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+              e.currentTarget.style.background = "transparent";
+            }}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Dashboard</span>
+          </Link>
+          {activePanel && (
+            <>
+              <span style={{ color: "rgba(255,255,255,0.12)" }}>·</span>
+              <button
+                type="button"
+                id="close-active-panel"
+                onClick={activePanel.close}
+                className="flex items-center gap-1.5 text-sm transition-colors rounded-lg px-2 py-1.5"
+                style={{ color: "rgba(255,255,255,0.5)" }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "white";
+                  e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+                <X className="w-4 h-4" />
+                <span className="hidden sm:inline text-xs">Close {activePanel.label}</span>
+              </button>
+            </>
           )}
           <span style={{ color: "rgba(255,255,255,0.12)" }}>/</span>
           <div className="flex items-center gap-2">
-            <Film className="w-4 h-4" style={{ color: "#4f9eff" }} />
+            <Film className="w-4 h-4" style={{ color: "#FFFFFF" }} />
             <span className="font-semibold text-white text-sm">
               {isLoading ? "Loading..." : project?.title}
             </span>
@@ -145,7 +159,7 @@ export default function QueryPage({ params }: QueryPageProps) {
           {project && (
             <div
               className="hidden md:flex items-center gap-1.5 text-xs"
-              style={{ color: "rgba(160,180,255,0.4)" }}
+              style={{ color: "rgba(255,255,255,0.4)" }}
             >
               <BookOpen className="w-3.5 h-3.5" />
               {project.scene_count} scenes · {project.page_count} indexed page
@@ -163,12 +177,12 @@ export default function QueryPage({ params }: QueryPageProps) {
                 onClick={() => setShowGraph(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
                 style={{
-                  background: showGraph ? "rgba(139,92,246,0.18)" : "rgba(139,92,246,0.07)",
-                  border: `1px solid ${showGraph ? "rgba(139,92,246,0.5)" : "rgba(139,92,246,0.2)"}`,
-                  color: "#A78BFA",
+                  background: showGraph ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.07)",
+                  border: `1px solid ${showGraph ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.2)"}`,
+                  color: "#FFFFFF",
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(139,92,246,0.16)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = showGraph ? "rgba(139,92,246,0.18)" : "rgba(139,92,246,0.07)"; }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.16)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = showGraph ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.07)"; }}
               >
                 <Network className="w-3.5 h-3.5" />
                 <span className="hidden lg:inline">Characters</span>
@@ -180,12 +194,12 @@ export default function QueryPage({ params }: QueryPageProps) {
                 onClick={() => setShowStoryboard(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
                 style={{
-                  background: showStoryboard ? "rgba(20,184,166,0.15)" : "rgba(20,184,166,0.06)",
-                  border: `1px solid ${showStoryboard ? "rgba(20,184,166,0.5)" : "rgba(20,184,166,0.18)"}`,
-                  color: "#2dd4bf",
+                  background: showStoryboard ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.06)",
+                  border: `1px solid ${showStoryboard ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.18)"}`,
+                  color: "#FFFFFF",
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(20,184,166,0.14)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = showStoryboard ? "rgba(20,184,166,0.15)" : "rgba(20,184,166,0.06)"; }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = showStoryboard ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.06)"; }}
               >
                 <BookMarked className="w-3.5 h-3.5" />
                 <span className="hidden lg:inline">Story Beats</span>
@@ -197,15 +211,32 @@ export default function QueryPage({ params }: QueryPageProps) {
                 onClick={() => setShowVideo(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
                 style={{
-                  background: showVideo ? "rgba(96,165,250,0.16)" : "rgba(96,165,250,0.06)",
-                  border: `1px solid ${showVideo ? "rgba(96,165,250,0.5)" : "rgba(96,165,250,0.18)"}`,
-                  color: "#60A5FA",
+                  background: showVideo ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.06)",
+                  border: `1px solid ${showVideo ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.18)"}`,
+                  color: "#FFFFFF",
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(96,165,250,0.14)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = showVideo ? "rgba(96,165,250,0.16)" : "rgba(96,165,250,0.06)"; }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = showVideo ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.06)"; }}
               >
                 <PlaySquare className="w-3.5 h-3.5" />
                 <span className="hidden lg:inline">Scene Clips</span>
+              </button>
+
+              {/* Narrator */}
+              <button
+                id="narrator-panel-btn"
+                onClick={() => setShowNarrator(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                style={{
+                  background: showNarrator ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.06)",
+                  border: `1px solid ${showNarrator ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.18)"}`,
+                  color: "#FFFFFF",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = showNarrator ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.06)"; }}
+              >
+                <Mic2 className="w-3.5 h-3.5" />
+                <span className="hidden lg:inline">Narrator</span>
               </button>
 
               {/* Share */}
@@ -214,12 +245,12 @@ export default function QueryPage({ params }: QueryPageProps) {
                 onClick={() => setShowShare(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
                 style={{
-                  background: "rgba(79,158,255,0.08)",
-                  border: "1px solid rgba(79,158,255,0.2)",
-                  color: "#4f9eff",
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  color: "#FFFFFF",
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(79,158,255,0.16)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(79,158,255,0.08)"; }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.16)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
               >
                 <Users className="w-3.5 h-3.5" />
                 <span className="hidden lg:inline">Share</span>
@@ -231,10 +262,10 @@ export default function QueryPage({ params }: QueryPageProps) {
               <Link
                 href="/profile"
                 className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full border transition-all ml-1"
-                style={{ borderColor: "rgba(79,158,255,0.25)", background: "#0d1020" }}
+                style={{ borderColor: "rgba(255,255,255,0.25)", background: "#111111" }}
                 title={`${name} — Profile`}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(79,158,255,0.6)"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(79,158,255,0.25)"; }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.6)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.25)"; }}
               >
                 {avatar ? (
                   <Image src={avatar} alt={name} fill className="object-cover" unoptimized />
@@ -270,32 +301,32 @@ export default function QueryPage({ params }: QueryPageProps) {
               <div
                 className="w-full max-w-md rounded-2xl border p-6 shadow-2xl"
                 style={{
-                  background: "rgba(8,11,24,0.99)",
-                  borderColor: "rgba(79,158,255,0.15)",
-                  boxShadow: "0 0 60px rgba(79,158,255,0.08)",
+                  background: "rgba(10,10,10,0.99)",
+                  borderColor: "rgba(255,255,255,0.15)",
+                  boxShadow: "0 0 60px rgba(255,255,255,0.08)",
                 }}
               >
                 <div className="flex items-center justify-between mb-5">
                   <div>
                     <h2 className="text-base font-semibold text-white">Share Project</h2>
-                    <p className="text-xs mt-0.5" style={{ color: "rgba(160,180,255,0.5)" }}>
+                    <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>
                       Invite a crew member to{" "}
-                      <span style={{ color: "#4f9eff" }}>{project?.title}</span>
+                      <span style={{ color: "#FFFFFF" }}>{project?.title}</span>
                     </p>
                   </div>
                   <button
                     onClick={() => setShowShare(false)}
                     className="rounded-lg p-1.5 transition-colors"
-                    style={{ color: "rgba(160,180,255,0.4)" }}
+                    style={{ color: "rgba(255,255,255,0.4)" }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "white"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(160,180,255,0.4)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.4)"; }}
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: "rgba(160,180,255,0.6)" }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: "rgba(255,255,255,0.6)" }}>
                     Email address
                   </label>
                   <input
@@ -307,15 +338,15 @@ export default function QueryPage({ params }: QueryPageProps) {
                     className="w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-zinc-700 focus:outline-none transition"
                     style={{
                       background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(79,158,255,0.15)",
+                      border: "1px solid rgba(255,255,255,0.15)",
                     }}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(79,158,255,0.4)")}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(79,158,255,0.15)")}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)")}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)")}
                   />
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: "rgba(160,180,255,0.6)" }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: "rgba(255,255,255,0.6)" }}>
                     Crew role
                   </label>
                   <div className="relative">
@@ -326,16 +357,16 @@ export default function QueryPage({ params }: QueryPageProps) {
                       className="w-full appearance-none rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none transition cursor-pointer pr-9"
                       style={{
                         background: "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(79,158,255,0.15)",
+                        border: "1px solid rgba(255,255,255,0.15)",
                       }}
                     >
                       {CREW_ROLES.map((r) => (
-                        <option key={r.value} value={r.value} style={{ background: "#05070f" }}>
+                        <option key={r.value} value={r.value} style={{ background: "#000000" }}>
                           {r.label}
                         </option>
                       ))}
                     </select>
-                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "rgba(160,180,255,0.4)" }} />
+                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "rgba(255,255,255,0.4)" }} />
                   </div>
                 </div>
 
@@ -346,7 +377,7 @@ export default function QueryPage({ params }: QueryPageProps) {
                     disabled={!inviteEmail || inviteMutation.isPending}
                     id="send-invite-btn"
                     className="flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white transition-all disabled:opacity-50"
-                    style={{ background: "linear-gradient(135deg,#4f9eff,#7c6dff)" }}
+                    style={{ background: "linear-gradient(135deg,#FFFFFF,#C0C0C0)" }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.9"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
                   >
@@ -357,9 +388,9 @@ export default function QueryPage({ params }: QueryPageProps) {
                     type="button"
                     onClick={() => setShowShare(false)}
                     className="px-4 rounded-xl py-2.5 text-sm font-medium transition-all"
-                    style={{ border: "1px solid rgba(79,158,255,0.15)", color: "rgba(160,180,255,0.5)" }}
+                    style={{ border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.5)" }}
                     onMouseEnter={(e) => { e.currentTarget.style.color = "white"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(160,180,255,0.5)"; e.currentTarget.style.background = "transparent"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.5)"; e.currentTarget.style.background = "transparent"; }}
                   >
                     Cancel
                   </button>
@@ -371,27 +402,26 @@ export default function QueryPage({ params }: QueryPageProps) {
       </AnimatePresence>
 
       {/* ── Main Content ─────────────────────────────────────────────────────── */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* History Sidebar */}
         <div
-          className="w-72 border-r hidden lg:block overflow-hidden flex-shrink-0"
-          style={{ borderColor: "rgba(30,40,80,0.5)", background: "rgba(8,11,24,0.6)" }}
+          className="w-72 border-r hidden lg:flex flex-col overflow-hidden flex-shrink-0"
+          style={{ borderColor: "rgba(255,255,255,0.5)", background: "rgba(10,10,10,0.6)" }}
         >
           {project && <QueryHistory projectId={params.id} />}
         </div>
 
         {/* Query area — glowing blue border card */}
-        <div className="flex-1 p-4 md:p-5 overflow-y-auto flex flex-col">
+        <div className="flex-1 p-4 md:p-5 flex flex-col min-h-0">
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="flex-1 flex flex-col rounded-2xl overflow-hidden"
+            className="flex-1 flex flex-col rounded-2xl overflow-hidden min-h-0"
             style={{
-              border: "1.5px solid rgba(79,158,255,0.55)",
-              boxShadow: "0 0 0 1px rgba(79,158,255,0.08), 0 0 40px rgba(79,158,255,0.12), inset 0 0 60px rgba(79,158,255,0.03)",
-              background: "rgba(8,11,24,0.85)",
-              minHeight: "calc(100vh - 120px)",
+              border:     "1.5px solid rgba(255,255,255,0.55)",
+              boxShadow:  "0 0 0 1px rgba(255,255,255,0.08), 0 0 40px rgba(255,255,255,0.12), inset 0 0 60px rgba(255,255,255,0.03)",
+              background: "rgba(10,10,10,0.85)",
             }}
           >
             {isLoading ? (
@@ -406,18 +436,18 @@ export default function QueryPage({ params }: QueryPageProps) {
                 <div>
                   <div
                     className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
-                    style={{ background: "rgba(79,158,255,0.1)", border: "1px solid rgba(79,158,255,0.2)" }}
+                    style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)" }}
                   >
-                    <Film className="w-8 h-8" style={{ color: "#4f9eff" }} />
+                    <Film className="w-8 h-8" style={{ color: "#FFFFFF" }} />
                   </div>
                   <p className="text-lg font-semibold text-white mb-2">Still indexing…</p>
-                  <p className="text-sm" style={{ color: "rgba(160,180,255,0.4)" }}>
+                  <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
                     Scenes are being embedded. Check back in a minute.
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col p-6">
+              <div className="flex-1 flex flex-col p-5 min-h-0">
                 <QueryInterface projectId={params.id} />
               </div>
             )}
@@ -444,6 +474,12 @@ export default function QueryPage({ params }: QueryPageProps) {
         projectId={params.id}
         isOpen={showVideo}
         onClose={() => setShowVideo(false)}
+      />
+      {/* ── Narrator Panel ─────────────────────────────────────────────────────── */}
+      <CinematicNarratorPanel
+        projectId={params.id}
+        isOpen={showNarrator}
+        onClose={() => setShowNarrator(false)}
       />
     </main>
   );

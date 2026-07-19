@@ -66,7 +66,7 @@ export default function AboutPage() {
           className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.35em] text-zinc-400"
         >
           <Film className="h-4 w-4 text-gold-400" />
-          About CineRAG
+          About CineACUMEN
         </motion.div>
 
         <div className="mt-8 grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
@@ -85,7 +85,7 @@ export default function AboutPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mt-6 max-w-2xl text-base leading-relaxed text-zinc-400 md:text-lg"
             >
-              CineRAG helps film teams upload scripts, search scenes, and ask questions
+              CineACUMEN helps film teams upload scripts, search scenes, and ask questions
               in the language that feels natural. The goal is simple: reduce manual
               script hunting and give creative teams trustworthy answers with citations.
             </motion.p>
@@ -122,7 +122,7 @@ export default function AboutPage() {
           >
             <div className="flex items-center gap-2 text-sm font-medium text-white">
               <Sparkles className="h-4 w-4 text-gold-400" />
-              What CineRAG does
+              What CineACUMEN does
             </div>
             <div className="mt-5 space-y-4 text-sm leading-relaxed text-zinc-400">
               <p>1. Upload a screenplay and create a project.</p>

@@ -33,7 +33,7 @@ function formatRelativeTime(dateStr: string): string {
 
 function downloadQueryAsText(query: Query) {
   const lines: string[] = [
-    `CineRAG Query Export`,
+    `CineACUMEN Query Export`,
     `===================`,
     ``,
     `Query:`,
@@ -83,7 +83,7 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
   return (
     <div
       className="overflow-hidden transition-all last:border-b-0"
-      style={{ borderBottom: "1px solid rgba(79,158,255,0.07)" }}
+      style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
     >
       {/* Header row */}
       <div className="flex items-start gap-2 py-3.5">
@@ -105,14 +105,14 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             <span
               className="flex items-center gap-1 text-[10px]"
-              style={{ color: "rgba(160,180,255,0.35)" }}
+              style={{ color: "rgba(255,255,255,0.35)" }}
             >
               <Clock className="w-2.5 h-2.5" />
               {formatRelativeTime(query.created_at)}
             </span>
 
             {query.latency_ms && (
-              <span className="text-[10px]" style={{ color: "rgba(160,180,255,0.25)" }}>
+              <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.25)" }}>
                 {query.latency_ms}ms
               </span>
             )}
@@ -121,9 +121,9 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
               <span
                 className="rounded-full px-1.5 py-0.5 text-[9px]"
                 style={{
-                  background: "rgba(79,158,255,0.08)",
-                  border: "1px solid rgba(79,158,255,0.15)",
-                  color: "rgba(160,180,255,0.5)",
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  color: "rgba(255,255,255,0.5)",
                   fontFamily:
                     query.detected_language === "ml"
                       ? "Noto Sans Malayalam, Malayalam MN, Nirmala UI, sans-serif"
@@ -143,15 +143,15 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
             id={`download-${query.id}`}
             onClick={() => downloadQueryAsText(query)}
             className="rounded-lg p-1.5 transition-all"
-            style={{ color: "rgba(79,158,255,0.35)" }}
+            style={{ color: "rgba(255,255,255,0.35)" }}
             title="Download query & response"
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(79,158,255,0.1)";
-              e.currentTarget.style.color = "#4f9eff";
+              e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+              e.currentTarget.style.color = "#FFFFFF";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = "transparent";
-              e.currentTarget.style.color = "rgba(79,158,255,0.35)";
+              e.currentTarget.style.color = "rgba(255,255,255,0.35)";
             }}
           >
             <Download className="w-3.5 h-3.5" />
@@ -164,18 +164,18 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
             disabled={bookmarkMutation.isPending}
             className="rounded-lg p-1.5 transition-all"
             style={{
-              color: query.bookmarked ? "#4f9eff" : "rgba(79,158,255,0.35)",
+              color: query.bookmarked ? "#FFFFFF" : "rgba(255,255,255,0.35)",
             }}
             title={query.bookmarked ? "Remove bookmark" : "Bookmark"}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(79,158,255,0.1)";
-              e.currentTarget.style.color = "#4f9eff";
+              e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+              e.currentTarget.style.color = "#FFFFFF";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = "transparent";
               e.currentTarget.style.color = query.bookmarked
-                ? "#4f9eff"
-                : "rgba(79,158,255,0.35)";
+                ? "#FFFFFF"
+                : "rgba(255,255,255,0.35)";
             }}
           >
             {query.bookmarked ? (
@@ -189,14 +189,14 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
           <button
             onClick={() => setExpanded(!expanded)}
             className="rounded-lg p-1.5 transition-all"
-            style={{ color: "rgba(79,158,255,0.35)" }}
+            style={{ color: "rgba(255,255,255,0.35)" }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(79,158,255,0.1)";
-              e.currentTarget.style.color = "#4f9eff";
+              e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+              e.currentTarget.style.color = "#FFFFFF";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = "transparent";
-              e.currentTarget.style.color = "rgba(79,158,255,0.35)";
+              e.currentTarget.style.color = "rgba(255,255,255,0.35)";
             }}
           >
             {expanded ? (
@@ -220,14 +220,14 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
           >
             <div
               className="pb-4 pt-3"
-              style={{ borderTop: "1px solid rgba(79,158,255,0.07)" }}
+              style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
             >
               {/* Citations */}
               {query.citations && query.citations.length > 0 && (
                 <div className="mb-3">
                   <p
                     className="mb-2 text-[10px] font-medium"
-                    style={{ color: "rgba(160,180,255,0.4)" }}
+                    style={{ color: "rgba(255,255,255,0.4)" }}
                   >
                     References:
                   </p>
@@ -241,13 +241,13 @@ function QueryRow({ query, projectId }: { query: Query; projectId: string }) {
               <div
                 className="text-xs leading-relaxed rounded-lg p-3"
                 style={{
-                  background: "rgba(79,158,255,0.04)",
-                  border: "1px solid rgba(79,158,255,0.1)",
-                  color: "rgba(200,215,255,0.7)",
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "rgba(255,255,255,0.7)",
                   whiteSpace: "pre-wrap",
                 }}
               >
-                {query.response_text}
+                {query.response_text?.replace(/<think>[\s\S]*?(?:<\/think>|$)/g, '').trim()}
               </div>
             </div>
           </motion.div>
@@ -274,7 +274,7 @@ export function QueryHistory({ projectId }: QueryHistoryProps) {
   /* Download ALL visible queries as one text file */
   const downloadAll = () => {
     if (!displayed.length) return;
-    const lines: string[] = ["CineRAG Query History Export", "============================", ""];
+    const lines: string[] = ["CineACUMEN Query History Export", "============================", ""];
     displayed.forEach((q, idx) => {
       lines.push(`[${idx + 1}] ${new Date(q.created_at).toLocaleString()}`);
       lines.push(`Q: ${q.query_text}`);
@@ -299,13 +299,13 @@ export function QueryHistory({ projectId }: QueryHistoryProps) {
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 py-3 flex-shrink-0"
-        style={{ borderBottom: "1px solid rgba(79,158,255,0.08)" }}
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
       >
         <div className="flex items-center gap-2">
-          <MessageSquare className="w-3.5 h-3.5" style={{ color: "#4f9eff" }} />
+          <MessageSquare className="w-3.5 h-3.5" style={{ color: "#FFFFFF" }} />
           <h3
             className="text-xs font-semibold"
-            style={{ color: "rgba(200,215,255,0.8)" }}
+            style={{ color: "rgba(255,255,255,0.8)" }}
           >
             Query History
           </h3>
@@ -318,15 +318,15 @@ export function QueryHistory({ projectId }: QueryHistoryProps) {
             onClick={downloadAll}
             disabled={!displayed.length}
             className="rounded-lg p-1.5 transition-all disabled:opacity-30"
-            style={{ color: "rgba(79,158,255,0.4)" }}
+            style={{ color: "rgba(255,255,255,0.4)" }}
             title="Download all queries"
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(79,158,255,0.1)";
-              e.currentTarget.style.color = "#4f9eff";
+              e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+              e.currentTarget.style.color = "#FFFFFF";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = "transparent";
-              e.currentTarget.style.color = "rgba(79,158,255,0.4)";
+              e.currentTarget.style.color = "rgba(255,255,255,0.4)";
             }}
           >
             <Download className="w-3.5 h-3.5" />
@@ -339,22 +339,22 @@ export function QueryHistory({ projectId }: QueryHistoryProps) {
             className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[10px] font-medium transition-all"
             style={{
               background: showBookmarked
-                ? "rgba(79,158,255,0.12)"
+                ? "rgba(255,255,255,0.12)"
                 : "transparent",
-              border: `1px solid ${showBookmarked ? "rgba(79,158,255,0.35)" : "rgba(79,158,255,0.12)"}`,
-              color: showBookmarked ? "#4f9eff" : "rgba(160,180,255,0.4)",
+              border: `1px solid ${showBookmarked ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.12)"}`,
+              color: showBookmarked ? "#FFFFFF" : "rgba(255,255,255,0.4)",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "rgba(79,158,255,0.35)";
-              e.currentTarget.style.color = "#4f9eff";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.35)";
+              e.currentTarget.style.color = "#FFFFFF";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = showBookmarked
-                ? "rgba(79,158,255,0.35)"
-                : "rgba(79,158,255,0.12)";
+                ? "rgba(255,255,255,0.35)"
+                : "rgba(255,255,255,0.12)";
               e.currentTarget.style.color = showBookmarked
-                ? "#4f9eff"
-                : "rgba(160,180,255,0.4)";
+                ? "#FFFFFF"
+                : "rgba(255,255,255,0.4)";
             }}
           >
             <Bookmark className="w-2.5 h-2.5" />
@@ -377,14 +377,14 @@ export function QueryHistory({ projectId }: QueryHistoryProps) {
           <div className="py-12 text-center">
             <Clock
               className="w-7 h-7 mx-auto mb-3"
-              style={{ color: "rgba(79,158,255,0.2)" }}
+              style={{ color: "rgba(255,255,255,0.2)" }}
             />
-            <p className="text-xs" style={{ color: "rgba(160,180,255,0.3)" }}>
+            <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
               {showBookmarked ? "No saved queries" : "No queries yet"}
             </p>
             <p
               className="font-malayalam text-[10px] mt-1"
-              style={{ color: "rgba(160,180,255,0.2)" }}
+              style={{ color: "rgba(255,255,255,0.2)" }}
             >
               {showBookmarked
                 ? "ബുക്ക്‌മാർക്ക് ഒന്നും ഇല്ല"

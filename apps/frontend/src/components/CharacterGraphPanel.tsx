@@ -121,11 +121,11 @@ const ROLE_META = {
   supporting: {
     Icon: Shield,
     label: "Supporting",
-    color: "#60A5FA",
-    bg: "rgba(96,165,250,0.10)",
-    border: "rgba(96,165,250,0.40)",
-    glow: "0 0 16px rgba(96,165,250,0.15)",
-    gradient: "linear-gradient(135deg, rgba(96,165,250,0.14), rgba(96,165,250,0.04))",
+    color: "#FFFFFF",
+    bg: "rgba(255,255,255,0.10)",
+    border: "rgba(255,255,255,0.40)",
+    glow: "0 0 16px rgba(255,255,255,0.15)",
+    gradient: "linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04))",
     pad: "10px 16px",
     nameSize: "13px",
     metaSize: "9px",
@@ -367,7 +367,7 @@ function getRelationshipColor(relationship: string): string {
   if (["rival", "enemy", "antagonist", "opponent"].some(k => r.includes(k)))
     return "#F87171"; // Red for conflict
   if (["boss", "employee", "colleague", "mentor", "student", "teacher"].some(k => r.includes(k)))
-    return "#60A5FA"; // Blue for professional
+    return "#FFFFFF"; // Blue for professional
   if (["uncle", "aunt", "cousin", "nephew", "niece", "guardian"].some(k => r.includes(k)))
     return "#C084FC"; // Purple for extended family
   return "#94A3B8"; // Default gray
@@ -608,7 +608,7 @@ export function CharacterGraphPanel({
               zIndex: 50,
               display: "flex",
               flexDirection: "column",
-              background: "rgba(5,7,15,0.98)",
+              background: "rgba(0,0,0,0.98)",
               border: "1px solid rgba(255,255,255,0.08)",
               borderRadius: "20px",
               overflow: "hidden",
@@ -738,10 +738,10 @@ export function CharacterGraphPanel({
                         borderRadius: 10,
                         padding: "7px 12px",
                         background: isRegenerating
-                          ? "rgba(251,191,36,0.05)"
-                          : "rgba(251,191,36,0.08)",
-                        border: "1px solid rgba(251,191,36,0.20)",
-                        color: isRegenerating ? "rgba(251,191,36,0.5)" : "#FBBF24",
+                          ? "rgba(255,255,255,0.05)"
+                          : "rgba(255,255,255,0.08)",
+                        border: "1px solid rgba(255,255,255,0.20)",
+                        color: isRegenerating ? "rgba(255,255,255,0.5)" : "#FBBF24",
                         cursor: isRegenerating ? "wait" : "pointer",
                         fontSize: "11px",
                         fontWeight: 700,
@@ -1029,7 +1029,7 @@ export function CharacterGraphPanel({
                       proOptions={{ hideAttribution: true }}
                       style={{ width: "100%", height: "100%" }}
                       defaultEdgeOptions={{
-                        style: { strokeWidth: 2, stroke: "#60A5FA" },
+                        style: { strokeWidth: 2, stroke: "#FFFFFF" },
                       }}
                     >
                       <Background
@@ -1397,9 +1397,9 @@ export function CharacterGraphPanel({
                       style={{
                         flex: 1,
                         padding: "12px 16px",
-                        background: activeTab === "relationships" ? "rgba(96,165,250,0.06)" : "transparent",
+                        background: activeTab === "relationships" ? "rgba(255,255,255,0.06)" : "transparent",
                         border: "none",
-                        borderBottom: activeTab === "relationships" ? "2px solid #60A5FA" : "2px solid transparent",
+                        borderBottom: activeTab === "relationships" ? "2px solid #FFFFFF" : "2px solid transparent",
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
@@ -1408,10 +1408,10 @@ export function CharacterGraphPanel({
                         transition: "all 0.15s",
                       }}
                     >
-                      <Link2 size={13} style={{ color: activeTab === "relationships" ? "#60A5FA" : "#6B7280" }} />
+                      <Link2 size={13} style={{ color: activeTab === "relationships" ? "#FFFFFF" : "#6B7280" }} />
                       <span
                         style={{
-                          color: activeTab === "relationships" ? "#60A5FA" : "var(--text-muted)",
+                          color: activeTab === "relationships" ? "#FFFFFF" : "var(--text-muted)",
                           fontSize: "11px",
                           fontWeight: 700,
                           textTransform: "uppercase",
@@ -1425,8 +1425,8 @@ export function CharacterGraphPanel({
                           style={{
                             padding: "1px 6px",
                             borderRadius: 6,
-                            background: activeTab === "relationships" ? "rgba(96,165,250,0.12)" : "rgba(255,255,255,0.06)",
-                            color: activeTab === "relationships" ? "#60A5FA" : "#6B7280",
+                            background: activeTab === "relationships" ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
+                            color: activeTab === "relationships" ? "#FFFFFF" : "#6B7280",
                             fontSize: "9px",
                             fontWeight: 700,
                           }}
@@ -1830,7 +1830,7 @@ export function CharacterGraphPanel({
                                           background: rel.confidence >= 0.85
                                             ? "rgba(52,211,153,0.12)"
                                             : rel.confidence >= 0.70
-                                            ? "rgba(251,191,36,0.12)"
+                                            ? "rgba(255,255,255,0.12)"
                                             : "rgba(248,113,113,0.12)",
                                           color: rel.confidence >= 0.85
                                             ? "#34D399"
@@ -1843,7 +1843,7 @@ export function CharacterGraphPanel({
                                             rel.confidence >= 0.85
                                               ? "rgba(52,211,153,0.3)"
                                               : rel.confidence >= 0.70
-                                              ? "rgba(251,191,36,0.3)"
+                                              ? "rgba(255,255,255,0.3)"
                                               : "rgba(248,113,113,0.3)"
                                           }`,
                                         }}

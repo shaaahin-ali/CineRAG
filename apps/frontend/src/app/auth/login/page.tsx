@@ -82,7 +82,7 @@ function LoginPageContent() {
             className="mb-10 flex items-center gap-2"
           >
             <Film className="h-5 w-5 text-amber-400" />
-            <span className="text-sm font-semibold tracking-tight text-white">CineRAG</span>
+            <span className="text-sm font-semibold tracking-tight text-white">CineACUMEN</span>
           </motion.div>
 
           {/* Heading */}
@@ -263,7 +263,7 @@ function LoginPageContent() {
             className="rounded-2xl border border-white/[0.08] bg-black/60 p-6 backdrop-blur-xl"
           >
             <p className="text-sm leading-relaxed text-white/80">
-              &ldquo;CineRAG transformed how I analyze my screenplays. The scene citations
+              &ldquo;CineACUMEN transformed how I analyze my screenplays. The scene citations
               are incredibly precise — it understands Malayalam cinema nuances better than
               any tool I&apos;ve used.&rdquo;
             </p>

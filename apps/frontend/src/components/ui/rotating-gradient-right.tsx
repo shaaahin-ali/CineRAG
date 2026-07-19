@@ -33,7 +33,7 @@ export default function RotatingGradientRight() {
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-sm font-medium flex items-center gap-2">
                   <Film className="w-4 h-4 text-gold-400" />
-                  CineRAG
+                  CineACUMEN
                 </span>
                 <span className="text-xs text-zinc-400">Live</span>
               </div>

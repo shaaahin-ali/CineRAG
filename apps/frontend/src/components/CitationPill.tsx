@@ -15,14 +15,14 @@ export function CitationPill({ citation, index }: CitationPillProps) {
 
   const emotionColors: Record<string, string> = {
     love: "#F43F5E",
-    sacrifice: "#8B5CF6",
+    sacrifice: "#FFFFFF",
     conflict: "#EF4444",
     joy: "#F59E0B",
     hope: "#10B981",
     separation: "#6366F1",
     sadness: "#64748B",
     grief: "#64748B",
-    longing: "#8B5CF6",
+    longing: "#FFFFFF",
   };
 
   return (

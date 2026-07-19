@@ -64,6 +64,7 @@ class ProjectOut(BaseModel):
     page_count: Optional[int] = None
     scene_count: Optional[int] = None
     character_count: Optional[int] = None
+    hero_image_url: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

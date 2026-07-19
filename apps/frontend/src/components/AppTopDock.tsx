@@ -20,6 +20,9 @@ export function AppTopDock() {
   const { status } = useSession();
   const isAuthenticated = status === "authenticated";
 
+  // Hide on query workspace — it has its own top nav and the dock covers the chat input
+  if (pathname.startsWith("/query/")) return null;
+
   const navItems: NavItem[] = [
     {
       id: "home",

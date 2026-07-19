@@ -46,7 +46,7 @@ function AuthChoiceContent() {
           className="mb-10 flex items-center justify-center gap-2"
         >
           <Film className="h-5 w-5 text-amber-400" />
-          <span className="text-sm font-semibold tracking-tight text-white">CineRAG</span>
+          <span className="text-sm font-semibold tracking-tight text-white">CineACUMEN</span>
         </motion.div>
 
         {/* Heading */}

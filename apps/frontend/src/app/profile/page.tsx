@@ -89,7 +89,7 @@ export default function ProfilePage() {
   const { plan } = useSubscription();
   const [showPricing, setShowPricing] = useState(false);
 
-  const name = session?.user?.name || "CineRAG User";
+  const name = session?.user?.name || "CineACUMEN User";
   const email = session?.user?.email || "";
   const avatar = session?.user?.image || "";
   const handle = email ? `@${email.split("@")[0]}` : "@user";
@@ -125,13 +125,15 @@ export default function ProfilePage() {
     : "—";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white pt-16">
+    <main className="relative min-h-screen overflow-hidden text-white pt-16"
+      style={{ background: "#000000" }}
+    >
       {/* ── Ambient background gradients ─────────────────────────────── */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 60% 40% at 20% 0%, rgba(253,176,34,0.07), transparent 60%), radial-gradient(ellipse 50% 50% at 80% 10%, rgba(253,176,34,0.04), transparent 50%), radial-gradient(circle at 50% 80%, rgba(255,255,255,0.02), transparent 40%)",
+            "radial-gradient(ellipse 60% 40% at 20% 0%, rgba(79,127,255,0.12), transparent 60%), radial-gradient(ellipse 50% 50% at 80% 10%, rgba(255,255,255,0.06), transparent 50%), radial-gradient(circle at 50% 80%, rgba(255,255,255,0.04), transparent 40%)",
         }}
       />
 
@@ -141,17 +143,18 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative overflow-hidden rounded-[32px] border border-white/10 bg-zinc-950 shadow-2xl"
+          className="relative overflow-hidden rounded-[32px] border border-white/[0.07] shadow-2xl"
+          style={{ background: "rgba(10,10,10,0.95)", border: "1px solid rgba(79,127,255,0.18)" }}
         >
-          {/* Gold accent strip */}
-          <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-amber-500/70 to-transparent" />
+          {/* Blue accent strip */}
+          <div className="absolute inset-x-0 top-0 h-[2px]" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.8), rgba(255,255,255,0.6), transparent)" }} />
 
           {/* Decorative shimmer */}
           <div
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(253,176,34,0.06), transparent 70%)",
+                "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(79,127,255,0.08), transparent 70%)",
             }}
           />
 
@@ -161,8 +164,8 @@ export default function ProfilePage() {
               <div className="flex flex-1 items-start gap-5">
                 {/* Avatar */}
                 <div className="group relative">
-                  <div className="absolute -inset-1 rounded-[22px] bg-gradient-to-br from-amber-500/30 via-amber-600/10 to-transparent opacity-60 blur-sm transition-opacity group-hover:opacity-100" />
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-[20px] border border-white/15 bg-zinc-900 ring-1 ring-amber-500/10 sm:h-24 sm:w-24">
+                  <div className="absolute -inset-1 rounded-[22px] opacity-60 blur-sm transition-opacity group-hover:opacity-100" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.15), transparent)" }} />
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-[20px] border bg-zinc-900 sm:h-24 sm:w-24" style={{ borderColor: "rgba(255,255,255,0.25)", boxShadow: "0 0 0 1px rgba(255,255,255,0.1)" }}>
                     {avatar ? (
                       <Image
                         src={avatar}
@@ -172,8 +175,8 @@ export default function ProfilePage() {
                         unoptimized
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-500/20 to-amber-600/5">
-                        <span className="text-2xl font-bold tracking-tight text-amber-400/80 sm:text-3xl">
+                      <div className="flex h-full w-full items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05))" }}>
+                        <span className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "rgba(255,255,255,0.9)" }}>
                           {getInitials(name)}
                         </span>
                       </div>
@@ -183,7 +186,7 @@ export default function ProfilePage() {
 
                 {/* Name + Meta */}
                 <div className="min-w-0 pt-1">
-                  <p className="text-[11px] font-medium uppercase tracking-[0.35em] text-amber-500/70">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.35em]" style={{ color: "rgba(255,255,255,0.8)" }}>
                     Your profile
                   </p>
                   <h1 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
@@ -263,7 +266,8 @@ export default function ProfilePage() {
               <motion.div
                 key={item.label}
                 variants={fadeUp}
-                className="group relative overflow-hidden rounded-[24px] border border-white/10 bg-zinc-950 p-5 transition-all hover:border-white/15"
+                className="group relative overflow-hidden rounded-[24px] p-5 transition-all hover:border-white/15"
+                style={{ background: "rgba(10,10,10,0.85)", border: "1px solid rgba(79,127,255,0.14)" }}
               >
                 {/* subtle gradient bg */}
                 <div
@@ -290,7 +294,8 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="rounded-[32px] border border-white/10 bg-zinc-950 p-6 sm:p-8"
+            className="rounded-[32px] p-6 sm:p-8"
+            style={{ background: "rgba(10,10,10,0.85)", border: "1px solid rgba(79,127,255,0.14)" }}
           >
             <div className="mb-6 flex items-center justify-between">
               <div>
@@ -389,7 +394,7 @@ export default function ProfilePage() {
             className="grid gap-4 self-start"
           >
             {/* Account info */}
-            <div className="rounded-[32px] border border-white/10 bg-zinc-950 p-6">
+            <div className="rounded-[32px] p-6" style={{ background: "rgba(10,10,10,0.85)", border: "1px solid rgba(79,127,255,0.14)" }}>
               <p className="text-[11px] font-medium uppercase tracking-[0.35em] text-zinc-500">
                 Account
               </p>
@@ -458,7 +463,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="rounded-[32px] border border-white/10 bg-zinc-950 p-6">
+            <div className="rounded-[32px] p-6" style={{ background: "rgba(10,10,10,0.85)", border: "1px solid rgba(79,127,255,0.14)" }}>
               <div className="flex items-center gap-2 text-sm font-medium text-white">
                 <Sparkles className="h-4 w-4 text-amber-400" />
                 Quick actions
@@ -473,12 +478,12 @@ export default function ProfilePage() {
                   },
                   {
                     label: "Explore features",
-                    desc: "See what CineRAG can do",
+                    desc: "See what CineACUMEN can do",
                     href: "/features",
                     icon: BarChart3,
                   },
                   {
-                    label: "About CineRAG",
+                    label: "About CineACUMEN",
                     desc: "Learn about the platform",
                     href: "/about",
                     icon: BookOpen,
@@ -520,7 +525,7 @@ export default function ProfilePage() {
         transition={{ delay: 0.3 }}
         className="relative z-10 mx-auto max-w-6xl px-4 pb-8 sm:px-6 lg:px-8"
       >
-        <div className="rounded-[32px] border border-white/10 bg-zinc-950 p-6 sm:p-8">
+        <div className="rounded-[32px] p-6 sm:p-8" style={{ background: "rgba(10,10,10,0.85)", border: "1px solid rgba(79,127,255,0.14)" }}>
           <div className="mb-6 flex items-center justify-between">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-[0.35em] text-zinc-500">

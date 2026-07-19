@@ -137,8 +137,8 @@ function useVoiceover(text: string) {
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 const CHAR_COLORS = [
-  "#FDB022", "#60A5FA", "#34D399", "#F472B6",
-  "#A78BFA", "#FB923C", "#38BDF8", "#4ADE80",
+  "#FDB022", "#FFFFFF", "#34D399", "#F472B6",
+  "#FFFFFF", "#FB923C", "#38BDF8", "#4ADE80",
 ];
 function charColor(name: string): string {
   let h = 0;
@@ -156,9 +156,9 @@ const STATUS_CONFIG: Record<
 > = {
   queued: {
     label: "Queued",
-    color: "#60A5FA",
-    bg: "rgba(96,165,250,0.1)",
-    border: "rgba(96,165,250,0.25)",
+    color: "#FFFFFF",
+    bg: "rgba(255,255,255,0.1)",
+    border: "rgba(255,255,255,0.25)",
   },
   generating: {
     label: "Generating",
@@ -297,11 +297,11 @@ function VideoJobCard({
           <div style={{ textAlign: "center" }}>
             <Clock
               size={28}
-              style={{ color: "rgba(96,165,250,0.5)", marginBottom: 8 }}
+              style={{ color: "rgba(255,255,255,0.5)", marginBottom: 8 }}
             />
             <p
               style={{
-                color: "rgba(96,165,250,0.6)",
+                color: "rgba(255,255,255,0.6)",
                 fontSize: 11,
                 fontWeight: 600,
               }}
@@ -476,12 +476,12 @@ function VideoJobCard({
                   <Volume2
                     size={10}
                     style={{
-                      color: "#A78BFA",
+                      color: "#FFFFFF",
                       animation: "pulse-ring 1.2s ease-in-out infinite",
                     }}
                   />
                 ) : (
-                  <Mic size={10} style={{ color: "#A78BFA" }} />
+                  <Mic size={10} style={{ color: "#FFFFFF" }} />
                 )
               ) : (
                 <MicOff size={10} style={{ color: "rgba(255,255,255,0.45)" }} />
@@ -490,7 +490,7 @@ function VideoJobCard({
                 style={{
                   fontSize: 9,
                   fontWeight: 700,
-                  color: enabled ? "#A78BFA" : "rgba(255,255,255,0.45)",
+                  color: enabled ? "#FFFFFF" : "rgba(255,255,255,0.45)",
                   letterSpacing: "0.04em",
                 }}
               >
@@ -534,7 +534,7 @@ function VideoJobCard({
                   borderRadius: 5,
                   background: "rgba(167,139,250,0.12)",
                   border: "1px solid rgba(167,139,250,0.25)",
-                  color: "#A78BFA",
+                  color: "#FFFFFF",
                   textTransform: "capitalize",
                 }}
               >
@@ -759,7 +759,7 @@ function VideoTheater({
           border: "1px solid rgba(255,255,255,0.1)",
         }}
       >
-        <Film size={13} style={{ color: "#60A5FA" }} />
+        <Film size={13} style={{ color: "#FFFFFF" }} />
         <span style={{ color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 700 }}>
           Scene #{current.scene_number}
         </span>
@@ -805,12 +805,12 @@ function VideoTheater({
                 padding: "8px 14px",
                 borderRadius: 10,
                 background: "rgba(0,0,0,0.8)",
-                border: "1px solid rgba(96,165,250,0.4)",
+                border: "1px solid rgba(255,255,255,0.4)",
                 backdropFilter: "blur(8px)",
               }}
             >
-              <Loader2 size={13} style={{ color: "#60A5FA", animation: "spin 1s linear infinite" }} />
-              <span style={{ color: "#60A5FA", fontSize: 12, fontWeight: 700 }}>
+              <Loader2 size={13} style={{ color: "#FFFFFF", animation: "spin 1s linear infinite" }} />
+              <span style={{ color: "#FFFFFF", fontSize: 12, fontWeight: 700 }}>
                 Next scene in {autoAdvance}s
               </span>
               <button
@@ -895,7 +895,7 @@ function VideoTheater({
                 width: i === idx ? 20 : 8,
                 height: 8,
                 borderRadius: 4,
-                background: i === idx ? "#60A5FA" : "rgba(255,255,255,0.2)",
+                background: i === idx ? "#FFFFFF" : "rgba(255,255,255,0.2)",
                 border: "none",
                 cursor: "pointer",
                 transition: "all 0.2s",
@@ -915,9 +915,9 @@ function VideoTheater({
             gap: 7,
             padding: "10px 20px",
             borderRadius: 12,
-            background: hasNext ? "rgba(96,165,250,0.12)" : "rgba(255,255,255,0.02)",
-            border: hasNext ? "1px solid rgba(96,165,250,0.35)" : "1px solid rgba(255,255,255,0.05)",
-            color: hasNext ? "#60A5FA" : "rgba(255,255,255,0.2)",
+            background: hasNext ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.02)",
+            border: hasNext ? "1px solid rgba(255,255,255,0.35)" : "1px solid rgba(255,255,255,0.05)",
+            color: hasNext ? "#FFFFFF" : "rgba(255,255,255,0.2)",
             fontSize: 13,
             fontWeight: 700,
             cursor: hasNext ? "pointer" : "not-allowed",
@@ -1068,12 +1068,12 @@ export function SceneVideosPanel({
                 zIndex: 50,
                 display: "flex",
                 flexDirection: "column",
-                background: "rgba(5,7,15,0.98)",
+                background: "rgba(0,0,0,0.98)",
                 border: "1px solid rgba(255,255,255,0.08)",
                 borderRadius: 20,
                 overflow: "hidden",
                 boxShadow:
-                  "0 25px 50px rgba(0,0,0,0.5), 0 0 80px rgba(96,165,250,0.03)",
+                  "0 25px 50px rgba(0,0,0,0.5), 0 0 80px rgba(255,255,255,0.03)",
               }}
             >
               {/* ── Header ── */}
@@ -1095,15 +1095,15 @@ export function SceneVideosPanel({
                       height: 42,
                       borderRadius: 14,
                       background:
-                        "linear-gradient(135deg, rgba(96,165,250,0.15), rgba(96,165,250,0.05))",
-                      border: "1px solid rgba(96,165,250,0.25)",
+                        "linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))",
+                      border: "1px solid rgba(255,255,255,0.25)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      boxShadow: "0 0 20px rgba(96,165,250,0.1)",
+                      boxShadow: "0 0 20px rgba(255,255,255,0.1)",
                     }}
                   >
-                    <Video size={20} style={{ color: "#60A5FA" }} />
+                    <Video size={20} style={{ color: "#FFFFFF" }} />
                   </div>
                   <div>
                     <h2
@@ -1160,11 +1160,11 @@ export function SceneVideosPanel({
                       gap: 5,
                       padding: "4px 10px",
                       borderRadius: 8,
-                      background: "rgba(96,165,250,0.08)",
-                      border: "1px solid rgba(96,165,250,0.2)",
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(255,255,255,0.2)",
                     }}
                   >
-                    <span style={{ color: "#60A5FA", fontSize: 10, fontWeight: 700 }}>
+                    <span style={{ color: "#FFFFFF", fontSize: 10, fontWeight: 700 }}>
                       Veo 3.1 Fast · Vertex AI
                     </span>
                   </div>
@@ -1204,7 +1204,7 @@ export function SceneVideosPanel({
                   padding: "16px 24px",
                   borderBottom: "1px solid rgba(255,255,255,0.05)",
                   flexShrink: 0,
-                  background: "rgba(96,165,250,0.02)",
+                  background: "rgba(255,255,255,0.02)",
                 }}
               >
                 <div
@@ -1215,7 +1215,7 @@ export function SceneVideosPanel({
                     marginBottom: 10,
                   }}
                 >
-                  <Wand2 size={15} style={{ color: "#60A5FA", marginTop: 1 }} />
+                  <Wand2 size={15} style={{ color: "#FFFFFF", marginTop: 1 }} />
                   <div>
                     <p
                       style={{
@@ -1250,7 +1250,7 @@ export function SceneVideosPanel({
                     style={{
                       flex: 1,
                       background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(96,165,250,0.2)",
+                      border: "1px solid rgba(255,255,255,0.2)",
                       borderRadius: 12,
                       padding: "10px 14px",
                       color: "white",
@@ -1262,10 +1262,10 @@ export function SceneVideosPanel({
                       transition: "border-color 0.15s",
                     }}
                     onFocus={(e) =>
-                      (e.currentTarget.style.borderColor = "rgba(96,165,250,0.45)")
+                      (e.currentTarget.style.borderColor = "rgba(255,255,255,0.45)")
                     }
                     onBlur={(e) =>
-                      (e.currentTarget.style.borderColor = "rgba(96,165,250,0.2)")
+                      (e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)")
                     }
                   />
                   <button
@@ -1280,10 +1280,10 @@ export function SceneVideosPanel({
                       borderRadius: 12,
                       background:
                         isTriggering
-                          ? "rgba(96,165,250,0.1)"
-                          : "rgba(96,165,250,0.15)",
-                      border: "1px solid rgba(96,165,250,0.35)",
-                      color: "#60A5FA",
+                          ? "rgba(255,255,255,0.1)"
+                          : "rgba(255,255,255,0.15)",
+                      border: "1px solid rgba(255,255,255,0.35)",
+                      color: "#FFFFFF",
                       fontSize: 13,
                       fontWeight: 700,
                       cursor: isTriggering ? "not-allowed" : "pointer",
@@ -1293,13 +1293,13 @@ export function SceneVideosPanel({
                     }}
                     onMouseEnter={(e) => {
                       if (!isTriggering) {
-                        e.currentTarget.style.background = "rgba(96,165,250,0.25)";
+                        e.currentTarget.style.background = "rgba(255,255,255,0.25)";
                       }
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = isTriggering
-                        ? "rgba(96,165,250,0.1)"
-                        : "rgba(96,165,250,0.15)";
+                        ? "rgba(255,255,255,0.1)"
+                        : "rgba(255,255,255,0.15)";
                     }}
                   >
                     {isTriggering ? (
@@ -1383,14 +1383,14 @@ export function SceneVideosPanel({
                         width: 64,
                         height: 64,
                         borderRadius: 20,
-                        background: "rgba(96,165,250,0.07)",
-                        border: "1px solid rgba(96,165,250,0.15)",
+                        background: "rgba(255,255,255,0.07)",
+                        border: "1px solid rgba(255,255,255,0.15)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
-                      <Video size={28} style={{ color: "rgba(96,165,250,0.5)" }} />
+                      <Video size={28} style={{ color: "rgba(255,255,255,0.5)" }} />
                     </div>
                     <div>
                       <p
@@ -1406,10 +1406,10 @@ export function SceneVideosPanel({
                       <p
                         style={{ color: "rgba(255,255,255,0.25)", fontSize: 12 }}
                       >
-                        Click <strong style={{ color: "#60A5FA" }}>Generate</strong> above to
+                        Click <strong style={{ color: "#FFFFFF" }}>Generate</strong> above to
                         create cinematic AI video previews for the top 4 scenes.
                         <br />
-                        Powered by <strong style={{ color: "#60A5FA" }}>Veo 3.1 Fast</strong> · 5-second clips · 16:9 cinematic.
+                        Powered by <strong style={{ color: "#FFFFFF" }}>Veo 3.1 Fast</strong> · 5-second clips · 16:9 cinematic.
                         <br />
                         Optionally add creative direction first.
                       </p>

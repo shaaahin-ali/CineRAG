@@ -26,7 +26,7 @@ export default function FeaturesPage() {
                     transition={{ duration: 0.5 }}
                     className="text-xs uppercase tracking-[0.35em] text-gold-400/80 font-mono mb-6"
                 >
-                    What Powers CineRAG
+                    What Powers CineACUMEN
                 </motion.p>
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
@@ -42,7 +42,7 @@ export default function FeaturesPage() {
                     transition={{ duration: 0.6, delay: 0.25 }}
                     className="text-lg text-zinc-500 max-w-2xl mx-auto leading-relaxed"
                 >
-                    The intelligence behind CineRAG. A deep dive into the capabilities of our AI-powered screenplay assistant.
+                    The intelligence behind CineACUMEN. A deep dive into the capabilities of our AI-powered screenplay assistant.
                 </motion.p>
             </div>
 
@@ -110,7 +110,7 @@ export default function FeaturesPage() {
                 description={
                     <>
                         Query your screenplay in Malayalam or English and receive
-                        precise, context-aware answers. CineRAG bridges language
+                        precise, context-aware answers. CineACUMEN bridges language
                         barriers so every crew member can access the story&apos;s
                         depth effortlessly.
                     </>

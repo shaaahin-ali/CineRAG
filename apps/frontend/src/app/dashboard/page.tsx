@@ -7,15 +7,11 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import {
   Film,
-  Layers3,
   Plus,
   Sparkles,
   X,
   Upload,
   Wand2,
-  CheckCircle2,
-  AlertCircle,
-  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -30,9 +26,9 @@ import { projectSchema, ProjectInput } from "@/lib/validators";
 import { Project } from "@/types";
 import { Footer } from "@/components/ui/footer-section";
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ──────────────────────────────────────────────────────────────────────────── */
 /*  Animation variants                                                        */
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ──────────────────────────────────────────────────────────────────────────── */
 
 const stagger = {
   hidden: {},
@@ -44,20 +40,9 @@ const staggerItem = {
   show: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" as const } },
 } as const;
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-/*  Stat card config                                                          */
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
-const STAT_CONFIG = [
-  { label: "Total",      icon: Layers3,      accent: "var(--accent-blue)",   dim: "var(--accent-blue-dim)" },
-  { label: "Ready",      icon: CheckCircle2, accent: "var(--accent-green)",  dim: "var(--accent-green-dim)" },
-  { label: "Processing", icon: Loader2,      accent: "var(--accent-cyan)",   dim: "var(--accent-cyan-dim)" },
-  { label: "Errors",     icon: AlertCircle,  accent: "#F87171",              dim: "rgba(248,113,113,0.08)" },
-] as const;
-
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ──────────────────────────────────────────────────────────────────────────── */
 /*  Page                                                                      */
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ──────────────────────────────────────────────────────────────────────────── */
 
 function DashboardContent() {
   const [showCreate, setShowCreate] = useState(false);
@@ -69,6 +54,7 @@ function DashboardContent() {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
   const currentUserId = (session?.user as { id?: string } | undefined)?.id;
+  const userName = session?.user?.name || "User";
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -116,14 +102,7 @@ function DashboardContent() {
     onError: (err: Error) => toast.error("Failed to delete project", { description: err.message }),
   });
 
-  const stats = useMemo(() => {
-    const ready = projects.filter((p) => p.status === "ready").length;
-    const processing = projects.filter((p) => p.status === "uploading" || p.status === "indexing").length;
-    const errored = projects.filter((p) => p.status === "error").length;
-    return { total: projects.length, ready, processing, errors: errored };
-  }, [projects]);
-
-  /* â”€â”€ Shared panel styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Shared panel styles ─────────────────────────────────────────── */
   const panelStyle = {
     background: "var(--bg-card)",
     border: "1px solid var(--border-card)",
@@ -143,129 +122,96 @@ function DashboardContent() {
       className="relative min-h-screen overflow-hidden text-white pt-16"
       style={{ background: "var(--bg-deep)" }}
     >
-      {/* â”€â”€ Ambient radial glows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ── Ambient radial glows ─────────────────────────────────────── */}
       <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
         <div style={{
           position: "absolute", top: "-10%", left: "50%", transform: "translateX(-50%)",
           width: "80vw", height: "50vh",
-          background: "radial-gradient(ellipse at center, rgba(79,127,255,0.1) 0%, transparent 65%)",
+          background: "radial-gradient(ellipse at center, rgba(255,255,255,0.035) 0%, transparent 65%)",
           filter: "blur(1px)",
         }} />
         <div style={{
           position: "absolute", bottom: "0", right: "0",
           width: "40vw", height: "40vh",
-          background: "radial-gradient(ellipse at bottom right, rgba(56,201,232,0.05) 0%, transparent 65%)",
+          background: "radial-gradient(ellipse at bottom right, rgba(255,255,255,0.015) 0%, transparent 65%)",
         }} />
       </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
 
-        {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* ── Welcome Header ─────────────────────────────────────────── */}
         <motion.header
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-10 flex items-end justify-between"
+          className="mb-8"
         >
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.35em]" style={{ color: "var(--accent-blue)" }}>
-              Dashboard
-            </p>
-            <h1 className="mt-2 text-4xl font-black tracking-tight sm:text-5xl" style={{ color: "var(--text-primary)" }}>
-              Your workspace.
-            </h1>
-            <p className="mt-3 max-w-md text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-              Create projects, upload screenplays, and query scenes with AI â€” all in one cinematic space.
-            </p>
-          </div>
+          <h1
+            className="text-3xl font-bold tracking-tight sm:text-4xl"
+            style={{ color: "var(--text-primary)" }}
+          >
+            Welcome back, {userName}.
+          </h1>
+          <p
+            className="mt-2 text-sm leading-relaxed"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            Here is the status of your active productions.
+          </p>
 
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              id="header-screenplay-assist"
-              onClick={() => setShowScreenplayAssist(true)}
-              className="hidden items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 sm:inline-flex"
-              style={{
-                background: "linear-gradient(135deg,rgba(139,92,246,0.15),rgba(236,72,153,0.12))",
-                border: "1px solid rgba(139,92,246,0.35)",
-                color: "#c084fc",
-                boxShadow: "0 0 20px rgba(139,92,246,0.1)",
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = "rgba(139,92,246,0.6)";
-                e.currentTarget.style.color = "#e879f9";
-                e.currentTarget.style.boxShadow = "0 0 30px rgba(139,92,246,0.2)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = "rgba(139,92,246,0.35)";
-                e.currentTarget.style.color = "#c084fc";
-                e.currentTarget.style.boxShadow = "0 0 20px rgba(139,92,246,0.1)";
-              }}
-            >
-              <Wand2 className="h-4 w-4" />
-              Write screenplay
-            </button>
-
+          {/* Action buttons */}
+          <div className="mt-5 flex items-center gap-3">
             <button
               type="button"
               id="header-create-project"
               onClick={() => hasPlan() ? setShowCreate(true) : setShowPricing(true)}
-              className="hidden items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold sm:inline-flex btn-primary"
+              className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5"
+              style={{
+                background: "transparent",
+                border: "1px solid rgba(255, 255, 255, 0.25)",
+                color: "#FFFFFF",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.06)";
+                e.currentTarget.style.boxShadow = "0 0 20px rgba(255,255,255,0.06)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             >
               <Plus className="h-4 w-4" />
-              New project
+              New Project
+            </button>
+
+            <button
+              type="button"
+              id="header-screenplay-assist"
+              onClick={() => setShowScreenplayAssist(true)}
+              className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5"
+              style={{
+                background: "transparent",
+                border: "1px solid rgba(255, 255, 255, 0.10)",
+                color: "var(--text-secondary)",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.25)";
+                e.currentTarget.style.color = "#FFFFFF";
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.10)";
+                e.currentTarget.style.color = "var(--text-secondary)";
+                e.currentTarget.style.background = "transparent";
+              }}
+            >
+              <Wand2 className="h-4 w-4" />
+              Write Screenplay
             </button>
           </div>
         </motion.header>
 
-        {/* â”€â”€ Stats strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-        <motion.section
-          variants={stagger}
-          initial="hidden"
-          animate="show"
-          className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-4"
-        >
-          {STAT_CONFIG.map((cfg, idx) => {
-            const Icon = cfg.icon;
-            const value = [stats.total, stats.ready, stats.processing, stats.errors][idx];
-            return (
-              <motion.div
-                key={cfg.label}
-                variants={staggerItem}
-                className="group rounded-2xl p-4 transition-all duration-300"
-                style={{
-                  background: "var(--bg-card)",
-                  border: "1px solid var(--border-card)",
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.borderColor = cfg.accent;
-                  (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 32px ${cfg.dim}`;
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "var(--border-card)";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
-                }}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--text-muted)" }}>
-                    {cfg.label}
-                  </span>
-                  <div
-                    className="flex h-7 w-7 items-center justify-center rounded-lg"
-                    style={{ background: cfg.dim }}
-                  >
-                    <Icon className="h-3.5 w-3.5" style={{ color: cfg.accent }} />
-                  </div>
-                </div>
-                <div className="text-3xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
-                  {value}
-                </div>
-              </motion.div>
-            );
-          })}
-        </motion.section>
-
-        {/* â”€â”€ Panels: Create / Upload / Edit â”€â”€ */}
+        {/* ── Panels: Create / Upload / Edit ── */}
         <AnimatePresence>
           {showCreate && (
             <motion.section
@@ -327,7 +273,7 @@ function DashboardContent() {
                       disabled={createMutation.isPending}
                       className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                      {createMutation.isPending ? "Creatingâ€¦" : "Create project"}
+                      {createMutation.isPending ? "Creating…" : "Create project"}
                     </button>
                     <button
                       type="button"
@@ -446,7 +392,7 @@ function DashboardContent() {
                       disabled={updateMutation.isPending}
                       className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                      {updateMutation.isPending ? "Savingâ€¦" : "Save changes"}
+                      {updateMutation.isPending ? "Saving…" : "Save changes"}
                     </button>
                     <button
                       type="button"
@@ -462,42 +408,19 @@ function DashboardContent() {
           )}
         </AnimatePresence>
 
-        {/* â”€â”€ Projects grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* ── Projects grid ─────────────────────────────────────────── */}
         <section className="pb-20">
-          <div className="mb-6 flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
-                Projects
-              </h2>
-              <p className="mt-1 text-xs" style={{ color: "var(--text-muted)" }}>
-                {currentUserId
-                  ? (() => {
-                      const owned = projects.filter(p => p.owner_id === currentUserId).length;
-                      const shared = projects.length - owned;
-                      if (owned === 0 && shared === 0) return "No projects yet â€” create one to get started.";
-                      if (owned > 0 && shared > 0) return `${owned} owned Â· ${shared} shared with you`;
-                      if (shared > 0) return `${shared} project${shared === 1 ? "" : "s"} shared with you`;
-                      return "Open a ready project to begin querying.";
-                    })()
-                  : "Open a ready project to begin querying."}
-              </p>
-            </div>
-
-            {/* Mobile create button */}
-            <button
-              type="button"
-              onClick={() => hasPlan() ? setShowCreate(true) : setShowPricing(true)}
-              className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold btn-primary sm:hidden"
-            >
-              <Plus className="h-4 w-4" />
-              Create
-            </button>
-          </div>
-
           {isLoading ? (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-44 rounded-2xl skeleton" style={{ border: "1px solid var(--border-subtle)" }} />
+                <div
+                  key={i}
+                  className="rounded-2xl skeleton"
+                  style={{
+                    border: "1px solid var(--border-subtle)",
+                    height: "320px",
+                  }}
+                />
               ))}
             </div>
           ) : projects.length === 0 ? (
@@ -517,7 +440,7 @@ function DashboardContent() {
                 No projects yet
               </h3>
               <p className="mx-auto mt-2 max-w-sm text-sm" style={{ color: "var(--text-secondary)" }}>
-                Upload a screenplay to unlock AI scene analysis, character graphs, and video previews â€” or write one from scratch.
+                Upload a screenplay to unlock AI scene analysis, character graphs, and video previews — or write one from scratch.
               </p>
 
               <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
@@ -540,46 +463,67 @@ function DashboardContent() {
               </div>
             </motion.div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <motion.div
+              variants={stagger}
+              initial="hidden"
+              animate="show"
+              className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+            >
               {/* Screenplay Assist card — always first */}
               <motion.button
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.38, ease: "easeOut" }}
+                variants={staggerItem}
                 onClick={() => setShowScreenplayAssist(true)}
                 id="screenplay-assist-card"
-                className="flex flex-col items-start gap-3 rounded-2xl p-5 text-left transition-all group cursor-pointer"
-                style={{
-                  background: "linear-gradient(135deg,rgba(139,92,246,0.08),rgba(236,72,153,0.06))",
-                  border: "1px dashed rgba(139,92,246,0.3)",
-                  minHeight: 160,
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(139,92,246,0.55)";
-                  (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg,rgba(139,92,246,0.14),rgba(236,72,153,0.1))";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 30px rgba(139,92,246,0.12)";
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(139,92,246,0.3)";
-                  (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg,rgba(139,92,246,0.08),rgba(236,72,153,0.06))";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
-                }}
+                className="project-card group text-left"
+                style={{ border: "1px dashed rgba(255, 255, 255, 0.12)" }}
               >
-                <div
-                  className="flex h-10 w-10 items-center justify-center rounded-xl transition-all"
-                  style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.25)" }}
-                >
-                  <Wand2 className="h-5 w-5" style={{ color: "#c084fc" }} />
+                {/* Gradient hero placeholder */}
+                <div className="project-card-image">
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(180,180,180,0.03) 50%, rgba(120,120,120,0.02) 100%)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: 16,
+                        background: "rgba(255, 255, 255, 0.06)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Wand2 className="h-6 w-6" style={{ color: "#FFFFFF" }} />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-bold" style={{ color: "#c084fc" }}>Write Screenplay</p>
-                  <p className="text-xs mt-1" style={{ color: "rgba(192,132,252,0.5)" }}>
+
+                <div className="project-card-body">
+                  <h3 className="project-card-title" style={{ color: "#FFFFFF" }}>
+                    Write Screenplay
+                  </h3>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
                     AI-powered screenplay from your idea
                   </p>
-                </div>
-                <div className="mt-auto flex items-center gap-1.5 text-xs" style={{ color: "rgba(139,92,246,0.6)" }}>
-                  <Sparkles className="h-3 w-3" />
-                  Generate screenplay
+                  <div
+                    className="query-script-btn"
+                    style={{
+                      borderColor: "rgba(255, 255, 255, 0.10)",
+                      background: "rgba(255, 255, 255, 0.03)",
+                      color: "var(--text-secondary)",
+                    }}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Generate Screenplay
+                  </div>
                 </div>
               </motion.button>
 
@@ -600,20 +544,20 @@ function DashboardContent() {
                   />
                 );
               })}
-            </div>
+            </motion.div>
           )}
         </section>
       </div>
 
       <Footer />
 
-      {/* â”€â”€ Screenplay Assist Panel â”€â”€ */}
+      {/* ── Screenplay Assist Panel ── */}
       <ScreenplayAssistPanel
         isOpen={showScreenplayAssist}
         onClose={() => setShowScreenplayAssist(false)}
       />
 
-      {/* â”€â”€ Pricing Modal â”€â”€ */}
+      {/* ── Pricing Modal ── */}
       <PricingModal
         isOpen={showPricing}
         onClose={() => setShowPricing(false)}

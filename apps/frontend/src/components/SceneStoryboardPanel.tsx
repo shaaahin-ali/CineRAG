@@ -54,8 +54,8 @@ interface SceneStoryboardPanelProps {
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 const CHAR_COLORS = [
-  "#FDB022", "#60A5FA", "#34D399", "#F472B6",
-  "#A78BFA", "#FB923C", "#38BDF8", "#4ADE80",
+  "#FDB022", "#FFFFFF", "#34D399", "#F472B6",
+  "#FFFFFF", "#FB923C", "#38BDF8", "#4ADE80",
 ];
 function charColor(name: string): string {
   let h = 0;
@@ -736,7 +736,7 @@ export function SceneStoryboardPanel({ projectId, isOpen, onClose }: SceneStoryb
                 zIndex: 50,
                 display: "flex",
                 flexDirection: "column",
-                background: "rgba(5,7,15,0.98)",
+                background: "rgba(0,0,0,0.98)",
                 border: "1px solid rgba(255,255,255,0.08)",
                 borderRadius: 20,
                 overflow: "hidden",

@@ -177,7 +177,7 @@ function ProgressBar({ durationMs, active, onDone }: { durationMs: number; activ
         style={{
           height: "100%",
           width: `${pct * 100}%`,
-          background: "linear-gradient(90deg, #A78BFA, #60A5FA)",
+          background: "linear-gradient(90deg, #FFFFFF, #FFFFFF)",
           borderRadius: 2,
           transition: "width 0.08s linear",
         }}
@@ -457,7 +457,7 @@ export function CinematicNarratorPanel({
                     width: 40,
                     height: 40,
                     borderRadius: 13,
-                    background: "linear-gradient(135deg, rgba(167,139,250,0.25), rgba(96,165,250,0.12))",
+                    background: "linear-gradient(135deg, rgba(167,139,250,0.25), rgba(255,255,255,0.12))",
                     border: "1px solid rgba(167,139,250,0.35)",
                     display: "flex",
                     alignItems: "center",
@@ -465,7 +465,7 @@ export function CinematicNarratorPanel({
                     boxShadow: "0 0 20px rgba(167,139,250,0.15)",
                   }}
                 >
-                  <Film size={19} style={{ color: "#A78BFA" }} />
+                  <Film size={19} style={{ color: "#FFFFFF" }} />
                 </div>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
@@ -476,9 +476,9 @@ export function CinematicNarratorPanel({
                       <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                         <Loader2
                           size={12}
-                          style={{ color: "#A78BFA", animation: "spin 1s linear infinite" }}
+                          style={{ color: "#FFFFFF", animation: "spin 1s linear infinite" }}
                         />
-                        <span style={{ color: "#A78BFA", fontSize: 10, fontWeight: 600, letterSpacing: "0.04em" }}>
+                        <span style={{ color: "#FFFFFF", fontSize: 10, fontWeight: 600, letterSpacing: "0.04em" }}>
                           AI WRITING…
                         </span>
                       </div>
@@ -530,7 +530,7 @@ export function CinematicNarratorPanel({
                     cursor: "pointer",
                     transition: "all 0.18s",
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.color = "#A78BFA"; e.currentTarget.style.borderColor = "rgba(167,139,250,0.4)"; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = "#FFFFFF"; e.currentTarget.style.borderColor = "rgba(167,139,250,0.4)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.6)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
                 >
                   <Globe size={13} />
@@ -559,7 +559,7 @@ export function CinematicNarratorPanel({
                       justifyContent: "center",
                       transition: "all 0.15s",
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = "#A78BFA"; e.currentTarget.style.borderColor = "rgba(167,139,250,0.4)"; }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = "#FFFFFF"; e.currentTarget.style.borderColor = "rgba(167,139,250,0.4)"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.4)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
                   >
                     <RefreshCw size={14} />
@@ -583,7 +583,7 @@ export function CinematicNarratorPanel({
                     borderRadius: 10,
                     background: voiceEnabled ? "rgba(167,139,250,0.15)" : "rgba(255,255,255,0.05)",
                     border: voiceEnabled ? "1px solid rgba(167,139,250,0.4)" : "1px solid rgba(255,255,255,0.12)",
-                    color: voiceEnabled ? "#A78BFA" : "rgba(255,255,255,0.35)",
+                    color: voiceEnabled ? "#FFFFFF" : "rgba(255,255,255,0.35)",
                     fontSize: 12,
                     fontWeight: 600,
                     cursor: "pointer",
@@ -686,7 +686,7 @@ export function CinematicNarratorPanel({
                     style={{
                       width: "100%", maxWidth: 860,
                       aspectRatio: "16/9", borderRadius: 18,
-                      background: "linear-gradient(135deg, rgba(167,139,250,0.06), rgba(96,165,250,0.03))",
+                      background: "linear-gradient(135deg, rgba(167,139,250,0.06), rgba(255,255,255,0.03))",
                       border: "1px solid rgba(167,139,250,0.1)",
                       display: "flex", flexDirection: "column",
                       alignItems: "center", justifyContent: "center", gap: 10,
@@ -773,7 +773,7 @@ export function CinematicNarratorPanel({
                         style={{
                           background: "rgba(167,139,250,0.14)",
                           border: "1px solid rgba(167,139,250,0.28)",
-                          color: "#A78BFA",
+                          color: "#FFFFFF",
                           fontSize: 10, fontWeight: 800,
                           padding: "3px 10px", borderRadius: 6,
                           letterSpacing: "0.08em",
@@ -807,7 +807,7 @@ export function CinematicNarratorPanel({
                       style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <Sparkles size={14} style={{ color: "#A78BFA" }} />
+                        <Sparkles size={14} style={{ color: "#FFFFFF" }} />
                         <span style={{ color: "rgba(167,139,250,0.8)", fontSize: 13, fontWeight: 600 }}>
                           Groq AI is reading & narrating all {scenes.length} scenes…
                         </span>
@@ -824,7 +824,7 @@ export function CinematicNarratorPanel({
                               width: 3,
                               height: 14,
                               borderRadius: 2,
-                              background: "#A78BFA",
+                              background: "#FFFFFF",
                               animation: `voice-pulse 1.2s ease-in-out ${i * 0.18}s infinite`,
                             }}
                           />
@@ -913,8 +913,8 @@ export function CinematicNarratorPanel({
                     width: 62, height: 62, borderRadius: 18,
                     background: isReady && scenes.length
                       ? isPlaying
-                        ? "linear-gradient(135deg, rgba(167,139,250,0.5), rgba(96,165,250,0.35))"
-                        : "linear-gradient(135deg, rgba(167,139,250,0.3), rgba(96,165,250,0.2))"
+                        ? "linear-gradient(135deg, rgba(167,139,250,0.5), rgba(255,255,255,0.35))"
+                        : "linear-gradient(135deg, rgba(167,139,250,0.3), rgba(255,255,255,0.2))"
                       : "rgba(255,255,255,0.04)",
                     border: isReady && scenes.length
                       ? "1px solid rgba(167,139,250,0.5)"
@@ -982,7 +982,7 @@ export function CinematicNarratorPanel({
                           height: 7,
                           borderRadius: 4,
                           background: i === currentIndex
-                            ? "#A78BFA"
+                            ? "#FFFFFF"
                             : hasNarration
                             ? "rgba(167,139,250,0.4)"
                             : "rgba(255,255,255,0.1)",

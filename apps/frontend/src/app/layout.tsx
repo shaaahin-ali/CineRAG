@@ -27,13 +27,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CineRAG — AI Screenplay Assistant for Mollywood",
+  title: "CineACUMEN — AI Screenplay Assistant for Mollywood",
   description:
     "Upload a Malayalam screenplay and query it in Malayalam or English. Get streaming answers with exact scene citations for your entire film crew.",
   keywords:
     "Malayalam cinema, Mollywood, screenplay AI, RAG, film crew, script analysis",
   openGraph: {
-    title: "CineRAG — AI for Mollywood",
+    title: "CineACUMEN — AI for Mollywood",
     description: "AI-powered screenplay analysis for Malayalam film crews",
     type: "website",
   },

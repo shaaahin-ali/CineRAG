@@ -82,7 +82,7 @@ class Settings(BaseSettings):
     MAX_FILE_SIZE: int = 52_428_800  # 50 MB
 
     # ── CORS ─────────────────────────────────────────────────────────────────
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: str = "http://localhost:3000"
 
     # ── Observability ────────────────────────────────────────────────────────
     LANGFUSE_PUBLIC_KEY: str = ""
@@ -105,17 +105,6 @@ class Settings(BaseSettings):
     # Get token (free $5 credit) at https://replicate.com/account/api-tokens
     # Model: zeroscope-v2-xl — ~$0.03 per 3s clip (~150 clips on $5)
     REPLICATE_API_TOKEN: str = ""
-
-    @field_validator("CORS_ORIGINS", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, v: str | List[str]) -> List[str]:
-        """Allow CORS_ORIGINS as JSON string or list."""
-        if isinstance(v, str):
-            try:
-                return json.loads(v)
-            except ValueError:
-                return [origin.strip() for origin in v.split(",")]
-        return v
 
     model_config = SettingsConfigDict(
         env_file=".env.local",

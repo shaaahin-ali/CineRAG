@@ -42,10 +42,10 @@ export function TopNavBar() {
       transition={{ duration: 0.4, ease: "easeOut" }}
       className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3"
       style={{
-        background:           "rgba(5, 11, 24, 0.85)",
+        background:           "rgba(0, 0, 0, 0.85)",
         backdropFilter:       "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        borderBottom:         "1px solid rgba(99, 149, 255, 0.1)",
+        borderBottom:         "1px solid rgba(255, 255, 255, 0.08)",
       }}
     >
       {/* Left: Logo */}
@@ -94,7 +94,7 @@ export function TopNavBar() {
                 <Image src={avatar} alt={name} fill className="object-cover" unoptimized />
               ) : (
                 <span className="flex h-full w-full items-center justify-center text-xs font-bold"
-                      style={{ color: "var(--accent-cyan)" }}>
+                      style={{ color: "#FFFFFF" }}>
                   {getInitials(name)}
                 </span>
               )}
