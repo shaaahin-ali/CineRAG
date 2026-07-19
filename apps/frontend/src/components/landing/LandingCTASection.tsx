@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
-import { useState, useRef, useEffect } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useState, useRef } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { ArrowRight, Zap, Check, Sparkles } from "lucide-react";

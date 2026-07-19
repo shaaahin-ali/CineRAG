@@ -151,7 +151,7 @@ export function QueryInterface({ projectId }: QueryInterfaceProps) {
             Hey, {firstName}.
           </h2>
           <p className="mt-2 text-sm max-w-xs" style={{ color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>
-            Ask anything about this production — I'll find the exact scenes.
+            Ask anything about this production — I&apos;ll find the exact scenes.
           </p>
 
           {/* Role badge */}

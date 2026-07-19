@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Clock, Film, ChevronRight, Sparkles, MessageSquare, X } from "lucide-react";
+import { Search, Clock, Film, ChevronRight, Sparkles, MessageSquare } from "lucide-react";
 
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    INTERACTIVE CHAT PREVIEW â€” simulates a live AI query session
