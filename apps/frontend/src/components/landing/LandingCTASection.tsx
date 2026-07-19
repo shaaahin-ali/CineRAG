@@ -119,7 +119,7 @@ export function LandingCTASection() {
           />
           {/* Inner card */}
           <div
-            className="relative rounded-2xl p-10 md:p-14 m-[1px]"
+            className="relative rounded-2xl p-6 sm:p-10 md:p-14 m-[1px]"
             style={{ background: "var(--bg-secondary)" }}
           >
             {/* Background particle accents */}

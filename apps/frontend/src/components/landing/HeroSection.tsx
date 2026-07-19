@@ -521,7 +521,7 @@ export function HeroSection() {
                         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                         exit={{ opacity: 0, y: -16, filter: "blur(6px)" }}
                         transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-                        className="text-5xl md:text-7xl font-black tracking-tight mb-8"
+                        className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight mb-8"
                         style={{
                           background: "linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-cyan) 60%, #e0f0ff 100%)",
                           WebkitBackgroundClip: "text",
@@ -547,7 +547,7 @@ export function HeroSection() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
-                            className="text-2xl md:text-4xl font-black tracking-tight"
+                            className="text-xl sm:text-2xl md:text-4xl font-black tracking-tight"
                             style={{ color: "var(--text-primary)" }}
                           >
                             {text.split(" ").map((word, i) => (
@@ -591,7 +591,7 @@ export function HeroSection() {
                     }}
                   />
                   <h1
-                    className="relative text-5xl md:text-8xl font-black tracking-tight text-center"
+                    className="relative text-4xl sm:text-5xl md:text-8xl font-black tracking-tight text-center px-4"
                     style={{
                       background: "linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-cyan) 55%, #ffffff 100%)",
                       WebkitBackgroundClip: "text",
@@ -693,7 +693,7 @@ export function HeroSection() {
             className="w-full mb-6"
           >
             <h1
-              className="text-4xl md:text-5xl lg:text-[3.5rem] font-black tracking-tight leading-[1.1] min-h-[2.4em]"
+              className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black tracking-tight leading-[1.1] min-h-[2.4em]"
               style={{
                 background: "linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-cyan) 100%)",
                 WebkitBackgroundClip: "text",

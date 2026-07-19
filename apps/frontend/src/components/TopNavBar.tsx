@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { CineRAGLogo } from "@/components/CineRAGLogo";
 
 function getInitials(name: string) {
@@ -34,8 +36,10 @@ export function TopNavBar() {
   if (pathname === "/auth" || pathname.startsWith("/query/")) return null;
 
   const isLanding = pathname === "/";
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
+    <>
     <motion.nav
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
@@ -118,7 +122,73 @@ export function TopNavBar() {
             </button>
           </>
         )}
+        {/* Mobile Menu Toggle */}
+        {isLanding && (
+          <button
+            className="md:hidden p-2 ml-2 text-white/70 hover:text-white"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        )}
       </div>
     </motion.nav>
+
+    {/* Mobile Menu Dropdown */}
+    <AnimatePresence>
+      {isMobileMenuOpen && isLanding && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed top-16 left-0 right-0 z-40 bg-black/95 border-b border-white/10 backdrop-blur-xl md:hidden flex flex-col items-center py-6 gap-6"
+        >
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              className="text-lg font-medium text-white/70 hover:text-white transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {link.label}
+            </a>
+          ))}
+          <div className="w-full h-px bg-white/10 my-2" />
+          {isAuthenticated ? (
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                router.push("/dashboard");
+              }}
+              className="btn-primary w-11/12 py-3"
+            >
+              Dashboard
+            </button>
+          ) : (
+            <div className="flex flex-col gap-3 w-11/12">
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  router.push("/auth");
+                }}
+                className="btn-outline w-full py-3"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  router.push("/auth");
+                }}
+                className="btn-primary w-full py-3"
+              >
+                Get Started
+              </button>
+            </div>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
+    </>
   );
 }

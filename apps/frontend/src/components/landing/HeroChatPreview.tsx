@@ -117,7 +117,7 @@ export function HeroChatPreview() {
       initial={{ opacity: 0, y: 32, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      className="relative w-full max-w-md mx-auto lg:mx-0"
+      className="relative w-full max-w-[90vw] md:max-w-md mx-auto lg:mx-0"
       style={{ animation: "float 5s ease-in-out infinite" }}
     >
       {/* Outer glow â€” animated */}
