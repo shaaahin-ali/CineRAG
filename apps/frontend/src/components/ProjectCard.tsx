@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
   Film,
   FileText,
-  Users,
+
   Edit2,
   Trash2,
   Share2,
@@ -14,14 +14,9 @@ import {
   Loader2,
 } from "lucide-react";
 import { Project } from "@/types";
-import { api } from "@/lib/api-client";
 
-interface SceneImage {
-  scene_number: number;
-  image_url: string;
-  image_prompt: string;
-  generated_at: string;
-}
+
+
 
 interface ProjectCardProps {
   project: Project;
@@ -70,6 +65,7 @@ export function ProjectCard({
       {/* ── Hero Image ─────────────────────────────────────────────── */}
       <div className="project-card-image">
         {heroImage ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={heroImage}
             alt={`${project.title} scene`}
