@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -236,7 +236,7 @@ export function LandingFooter() {
 
           <div className="flex items-center gap-4">
             <p className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>
-              Powered by RAG Â· Semantic Search Â· Gemini Â· Vector DB
+              Powered by Smart AI · Contextual Search · Advanced Analytics
             </p>
 
             {/* Back to top */}

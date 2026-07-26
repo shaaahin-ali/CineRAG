@@ -5,8 +5,9 @@ import { useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, HelpCircle, LogIn } from "lucide-react";
 import { CineRAGLogo } from "@/components/CineRAGLogo";
+import { HowToUseModal } from "@/components/HowToUseModal";
 
 function getInitials(name: string) {
   return name
@@ -31,12 +32,12 @@ export function TopNavBar() {
   const isAuthenticated = status === "authenticated";
   const name   = session?.user?.name  || "User";
   const avatar = session?.user?.image || "";
+  const isLanding = pathname === "/";
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showHowToUse, setShowHowToUse] = useState(false);
 
   // Don't show on auth page or query page
   if (pathname === "/auth" || pathname.startsWith("/query/")) return null;
-
-  const isLanding = pathname === "/";
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <>
@@ -57,7 +58,7 @@ export function TopNavBar() {
 
       {/* Center: Nav links — only on landing */}
       {isLanding && (
-        <div className="hidden md:flex items-center gap-1">
+        <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-1">
           {NAV_LINKS.map((link) => (
             <a
               key={link.label}
@@ -73,8 +74,36 @@ export function TopNavBar() {
         </div>
       )}
 
-      {/* Right: Auth actions */}
+      {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        {/* How to Use button — always visible */}
+        <motion.button
+          type="button"
+          onClick={() => setShowHowToUse(true)}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200"
+          style={{
+            color: "rgba(255,255,255,0.55)",
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.06)",
+          }}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#fff";
+            e.currentTarget.style.borderColor = "rgba(99,149,255,0.35)";
+            e.currentTarget.style.background = "rgba(99,149,255,0.08)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "rgba(255,255,255,0.55)";
+            e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
+            e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+          }}
+          title="How to use CineACUMEN"
+        >
+          <HelpCircle size={15} />
+          <span className="hidden sm:inline">How to Use</span>
+        </motion.button>
+
         {isAuthenticated ? (
           <>
             <button
@@ -106,22 +135,61 @@ export function TopNavBar() {
           </>
         ) : (
           <>
-            <button
+            {/* Login — clear text button, always visible */}
+            <motion.button
               type="button"
               onClick={() => router.push("/auth")}
-              className="btn-outline hidden md:flex"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200"
+              style={{
+                color: "#fff",
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.12)",
+              }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)";
+                e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+                e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+              }}
             >
+              <LogIn size={15} />
               Login
-            </button>
-            <button
+            </motion.button>
+
+            {/* Get Started — prominent glowing CTA */}
+            <motion.button
               type="button"
               onClick={() => router.push("/auth")}
-              className="btn-primary text-sm py-2 px-4"
+              className="relative text-sm font-bold py-2.5 px-5 rounded-xl overflow-hidden"
+              style={{
+                background: "linear-gradient(135deg, #6395FF 0%, #38C9E8 100%)",
+                color: "#000",
+                boxShadow: "0 0 20px rgba(99,149,255,0.3), 0 4px 16px rgba(56,201,232,0.2)",
+                border: "none",
+                cursor: "pointer",
+              }}
+              whileHover={{ scale: 1.06 }}
+              whileTap={{ scale: 0.95 }}
             >
-              Get Started
-            </button>
+              {/* Shimmer effect */}
+              <motion.div
+                className="absolute inset-0 opacity-60"
+                style={{
+                  background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.25) 50%, transparent 60%)",
+                  backgroundSize: "200% 100%",
+                }}
+                animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+              />
+              <span className="relative z-10">Get Started</span>
+            </motion.button>
           </>
         )}
+
         {/* Mobile Menu Toggle */}
         {isLanding && (
           <button
@@ -153,6 +221,19 @@ export function TopNavBar() {
               {link.label}
             </a>
           ))}
+
+          {/* How to Use — mobile */}
+          <button
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              setShowHowToUse(true);
+            }}
+            className="flex items-center gap-2 text-lg font-medium text-white/70 hover:text-white transition-colors"
+          >
+            <HelpCircle size={18} />
+            How to Use
+          </button>
+
           <div className="w-full h-px bg-white/10 my-2" />
           {isAuthenticated ? (
             <button
@@ -171,8 +252,14 @@ export function TopNavBar() {
                   setIsMobileMenuOpen(false);
                   router.push("/auth");
                 }}
-                className="btn-outline w-full py-3"
+                className="w-full py-3 rounded-xl text-base font-semibold flex items-center justify-center gap-2 transition-all"
+                style={{
+                  color: "#fff",
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                }}
               >
+                <LogIn size={18} />
                 Login
               </button>
               <button
@@ -180,7 +267,14 @@ export function TopNavBar() {
                   setIsMobileMenuOpen(false);
                   router.push("/auth");
                 }}
-                className="btn-primary w-full py-3"
+                className="w-full py-3 rounded-xl text-base font-bold"
+                style={{
+                  background: "linear-gradient(135deg, #6395FF 0%, #38C9E8 100%)",
+                  color: "#000",
+                  border: "none",
+                  cursor: "pointer",
+                  boxShadow: "0 0 20px rgba(99,149,255,0.3)",
+                }}
               >
                 Get Started
               </button>
@@ -189,6 +283,9 @@ export function TopNavBar() {
         </motion.div>
       )}
     </AnimatePresence>
+
+    {/* How To Use Modal */}
+    <HowToUseModal isOpen={showHowToUse} onClose={() => setShowHowToUse(false)} />
     </>
   );
 }

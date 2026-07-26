@@ -231,7 +231,7 @@ function MorphingText() {
 const STATS = [
   { icon: Film,     label: "Films Indexed",    value: "10,000+", color: "var(--accent-blue)"   },
   { icon: Brain,    label: "AI Queries/Day",    value: "50K+",    color: "var(--accent-cyan)"   },
-  { icon: Database, label: "Scene Vectors",     value: "2.4M",    color: "var(--accent-purple)" },
+  { icon: Database, label: "Scenes Analyzed",     value: "2.4M",    color: "var(--accent-purple)" },
   { icon: Eye,      label: "Accuracy Rate",     value: "99.2%",   color: "var(--accent-green)"  },
 ];
 
@@ -681,7 +681,7 @@ export function HeroSection() {
               transition={{ duration: 3, repeat: Infinity }}
             >
               <Sparkles className="w-3 h-3" />
-              AI RETRIEVAL FOR MOVING IMAGES
+              SMART SCRIPT ANALYSIS
             </motion.span>
           </motion.div>
 
@@ -714,7 +714,7 @@ export function HeroSection() {
             style={{ color: "var(--text-secondary)" }}
           >
             Instantly find scenes, quotes, emotions, and context across thousands
-            of films using advanced AI retrieval and semantic video search.
+            of films using advanced AI analysis and smart scene search.
           </motion.p>
 
           {/* Interactive Demo Strip */}

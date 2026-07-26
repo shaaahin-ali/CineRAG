@@ -27,10 +27,10 @@ const STEP_MAP: Record<string, { label: string; progress: number }> = {
   embedding:      { label: "Generating embeddings…",       progress: 58 },
   embedding_done: { label: "Embeddings ready",             progress: 70 },
   indexing:       { label: "Indexing into Pinecone…",      progress: 78 },
-  indexing_done:  { label: "Vectors indexed",              progress: 86 },
+  indexing_done:  { label: "Scenes mapped",              progress: 86 },
   saving:         { label: "Saving to database…",          progress: 92 },
   images:         { label: "Queuing scene images…",        progress: 96 },
-  ready:          { label: "Pipeline complete!",           progress: 100 },
+  ready:          { label: "Processing complete!",           progress: 100 },
   error:          { label: "Processing failed",            progress: 100 },
 };
 
@@ -83,7 +83,7 @@ export function UploadWidget({ projectId, onUploadStart, onUploadComplete }: Upl
             onUploadComplete?.();
           } else if (step === "error") {
             es.close();
-            setError(detail || "Pipeline failed");
+            setError(detail || "Processing failed");
             setState("error");
             toast.error("Indexing failed", { description: detail });
           }
@@ -148,7 +148,7 @@ export function UploadWidget({ projectId, onUploadStart, onUploadComplete }: Upl
 
         // Start SSE stream for live progress
         setProgress(6);
-        setProgressLabel("Pipeline starting…");
+        setProgressLabel("Processing starting…");
         await openProgressStream(projectId);
       } catch (err: unknown) {
         eventSourceRef.current?.close();

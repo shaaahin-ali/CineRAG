@@ -76,6 +76,7 @@ class Settings(BaseSettings):
     JWT_SECRET: str
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
+    SUPABASE_JWT_SECRET: str = ""
 
     # ── Storage ──────────────────────────────────────────────────────────────
     UPLOAD_DIR: str = "./uploads"

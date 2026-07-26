@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
@@ -165,8 +165,8 @@ const features = [
     tag: "Search",
     title: "Semantic Search",
     description:
-      "Find what you mean, not just keywords. Vector embeddings surface the exact dramatic moment across thousands of scenes.",
-    stat: { value: "2.4M", label: "vectors indexed" },
+      "Find what you mean, not just keywords. Our AI surfaces the exact dramatic moment across thousands of scenes.",
+    stat: { value: "2.4M", label: "scenes mapped" },
   },
   {
     id: "citations",
@@ -262,7 +262,7 @@ export function FeaturesGrid() {
             className="text-3xl md:text-5xl font-black tracking-tight leading-tight mb-4"
             style={{ color: "var(--text-primary)" }}
           >
-            A RAG pipeline that understands{" "}
+            An AI system that understands{" "}
             <motion.span
               style={{
                 background:

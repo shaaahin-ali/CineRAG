@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   description:
     "Upload a Malayalam screenplay and query it in Malayalam or English. Get streaming answers with exact scene citations for your entire film crew.",
   keywords:
-    "Malayalam cinema, Mollywood, screenplay AI, RAG, film crew, script analysis",
+    "Malayalam cinema, Mollywood, screenplay AI, film crew, script analysis",
   openGraph: {
     title: "CineACUMEN — AI for Mollywood",
     description: "AI-powered screenplay analysis for Malayalam film crews",
